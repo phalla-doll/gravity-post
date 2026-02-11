@@ -313,7 +313,7 @@ const App: React.FC = () => {
                     flex items-center overflow-hidden
                     transition-all ease-[cubic-bezier(0.25,1,0.5,1)] duration-500
                     ${isSearchOpen 
-                        ? 'bg-white ring-2 ring-purple-100 border-purple-300 w-[220px] sm:w-[260px]' 
+                        ? 'bg-white ring-2 ring-slate-100 border-slate-300 w-[220px] sm:w-[260px]' 
                         : 'hover:bg-white cursor-pointer w-[46px]'
                     }
                 `}
@@ -329,7 +329,7 @@ const App: React.FC = () => {
                 <div className="absolute left-0 top-0 bottom-0 w-[46px] flex items-center justify-center pointer-events-none z-10">
                     <Search 
                         size={20} 
-                        className={`transition-colors duration-300 ${isSearchOpen ? 'text-purple-500' : 'text-slate-600'}`} 
+                        className={`transition-colors duration-300 ${isSearchOpen ? 'text-slate-800' : 'text-slate-600'}`} 
                     />
                 </div>
 
@@ -369,7 +369,7 @@ const App: React.FC = () => {
                     setIsMenuOpen(!isMenuOpen);
                     setIsSearchOpen(false); // Close search if menu opens
                   }}
-                  className={`p-3 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white transition flex items-center justify-center ${isMenuOpen ? 'bg-white text-purple-600 ring-2 ring-purple-100' : 'bg-white/80 text-slate-600'}`}
+                  className={`p-3 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white transition flex items-center justify-center ${isMenuOpen ? 'bg-white text-slate-900 ring-2 ring-slate-100' : 'bg-white/80 text-slate-600'}`}
                 >
                   <Menu size={20} />
                 </button>
@@ -386,25 +386,25 @@ const App: React.FC = () => {
                     
                     <button 
                         onClick={() => handleMenuClick('profile')}
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors"
                     >
                       <User size={18} /> Profile
                     </button>
                     <button 
                         onClick={() => handleMenuClick('posts')}
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors"
                     >
                       <FileText size={18} /> My Posts
                     </button>
                     <button 
                         onClick={() => handleMenuClick('posts')} // Reusing posts modal with saved tab active logic could be better, but simpler to just open library
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors"
                     >
                       <Bookmark size={18} /> Saved
                     </button>
                     <button 
                         onClick={() => handleMenuClick('settings')}
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors"
                     >
                       <Settings size={18} /> Settings
                     </button>
@@ -417,13 +417,13 @@ const App: React.FC = () => {
                         <div className="flex bg-gray-100 p-1 rounded-xl">
                             <button 
                                 onClick={(e) => { e.stopPropagation(); setLanguage('en'); }}
-                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'en' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 English
                             </button>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); setLanguage('km'); }}
-                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'km' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'km' ? 'bg-white text-slate-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 Khmer
                             </button>
@@ -457,11 +457,11 @@ const App: React.FC = () => {
         {filteredPosts.length === 0 && searchQuery && (
              <div className="fixed inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 p-4 animate-in fade-in zoom-in duration-300 z-30 pointer-events-none">
                 <div className="bg-white p-6 rounded-full shadow-lg mb-2">
-                    <Ghost size={48} className="text-purple-400" />
+                    <Ghost size={48} className="text-slate-400" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-700">Poof! Nothing here.</h3>
                 <p className="text-center max-w-xs text-sm text-slate-500">
-                    We couldn't find any thought bubbles matching "<span className="font-semibold text-purple-600">{searchQuery}</span>".
+                    We couldn't find any thought bubbles matching "<span className="font-semibold text-slate-800">{searchQuery}</span>".
                 </p>
                 <button 
                   onClick={() => {
