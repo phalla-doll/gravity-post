@@ -53,56 +53,67 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="relative bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 border-4"
-        style={{ borderColor: post.color }}
+        className="relative bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-2xl border border-white/60 rounded-[2rem] w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
+        style={{ 
+            boxShadow: `0 25px 50px -12px ${post.color}50` // Soft colored shadow
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button 
-          onClick={onClose} 
-          className="absolute top-3 right-3 p-2 bg-white/40 hover:bg-white/80 rounded-full transition z-10 backdrop-blur-sm"
-        >
-          <X size={20} />
-        </button>
-
+        {/* Header - Mood Color */}
         <div 
           className="h-32 w-full flex items-center justify-center p-6 relative"
           style={{ backgroundColor: post.color }}
         >
-           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none" />
-           {/* Decorative Mood Icon/Text could go here */}
-           <span className="text-6xl opacity-20 filter grayscale contrast-200 mix-blend-overlay">
+           {/* Soft gradient overlay for depth */}
+           <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-transparent pointer-events-none" />
+           
+           <button 
+            onClick={onClose} 
+            className="absolute top-3 right-3 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition z-10 backdrop-blur-md border border-white/30"
+          >
+            <X size={20} />
+          </button>
+
+           <span className="text-6xl opacity-30 filter contrast-200 mix-blend-overlay text-white select-none">
              ❝
            </span>
         </div>
 
-        <div className="p-8 text-center -mt-6 bg-gradient-to-b from-white to-white/80 backdrop-blur-xl rounded-t-3xl relative">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
-              <span>{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}</span>
-              <span>•</span>
-              <span>{post.sentiment}</span>
+        {/* Content Body - Glassmorphism */}
+        <div className="p-8 text-center -mt-8 bg-gradient-to-b from-white/95 via-white/80 to-white/60 backdrop-blur-xl rounded-t-[2.5rem] relative border-t border-white/60 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            
+            {/* Metadata Pill */}
+            <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-white/50 border border-white/60 backdrop-blur-sm mb-5 shadow-sm">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    {new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-gray-400/50"></span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{post.sentiment}</span>
             </div>
             
-            <p className="text-2xl font-bold text-gray-800 leading-tight mb-2">
+            <p className="text-2xl font-bold text-gray-800 leading-tight mb-3 drop-shadow-sm">
               "{post.text}"
             </p>
 
-            {/* Username Display */}
-            <p className="text-sm font-medium text-gray-500 mb-8 tracking-wide">
+            <p className="text-sm font-medium text-gray-500 mb-8 tracking-wide flex items-center justify-center gap-1 opacity-80">
               {username}
             </p>
 
-            <div className="flex items-center justify-center gap-8">
+            {/* Actions */}
+            <div className="flex items-center justify-center gap-6">
               {/* Upvote Button */}
               <button 
                 onClick={() => handleVote(1)}
                 className={`
-                  flex flex-col items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                  ${animatingBtn === 1 ? 'scale-125 text-green-500' : (hasVoted === 1 ? 'text-green-600 scale-110' : 'text-gray-400 hover:text-gray-600 hover:scale-105')}
+                  flex flex-col items-center gap-2 transition-all duration-300
+                  ${animatingBtn === 1 ? 'scale-110' : 'hover:scale-105'}
                 `}
               >
                 <div className={`
-                  p-3 rounded-full transition-all duration-300 backdrop-blur-sm
-                  ${animatingBtn === 1 ? 'bg-green-200 ring-4 ring-green-100 shadow-lg' : (hasVoted === 1 ? 'bg-green-100' : 'bg-gray-100/50 border border-gray-100')}
+                  p-4 rounded-full transition-all duration-300 backdrop-blur-md border shadow-sm
+                  ${hasVoted === 1 
+                    ? 'bg-green-400/20 border-green-400/50 text-green-700 shadow-green-200' 
+                    : 'bg-white/40 border-white/60 text-gray-500 hover:bg-white/60'}
                 `}>
                   <ThumbsUp 
                     size={24} 
@@ -110,20 +121,24 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
                     fill={hasVoted === 1 ? "currentColor" : "none"} 
                   />
                 </div>
-                <span className="font-bold text-sm">{post.upvotes + (hasVoted === 1 ? 1 : 0)}</span>
+                <span className={`font-bold text-sm ${hasVoted === 1 ? 'text-green-600' : 'text-gray-400'}`}>
+                    {post.upvotes + (hasVoted === 1 ? 1 : 0)}
+                </span>
               </button>
 
               {/* Downvote Button */}
               <button 
                 onClick={() => handleVote(-1)}
                 className={`
-                  flex flex-col items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                  ${animatingBtn === -1 ? 'scale-125 text-red-500' : (hasVoted === -1 ? 'text-red-600 scale-110' : 'text-gray-400 hover:text-gray-600 hover:scale-105')}
+                  flex flex-col items-center gap-2 transition-all duration-300
+                  ${animatingBtn === -1 ? 'scale-110' : 'hover:scale-105'}
                 `}
               >
                 <div className={`
-                  p-3 rounded-full transition-all duration-300 backdrop-blur-sm
-                  ${animatingBtn === -1 ? 'bg-red-200 ring-4 ring-red-100 shadow-lg' : (hasVoted === -1 ? 'bg-red-100' : 'bg-gray-100/50 border border-gray-100')}
+                  p-4 rounded-full transition-all duration-300 backdrop-blur-md border shadow-sm
+                  ${hasVoted === -1 
+                    ? 'bg-red-400/20 border-red-400/50 text-red-600 shadow-red-200' 
+                    : 'bg-white/40 border-white/60 text-gray-500 hover:bg-white/60'}
                 `}>
                   <ThumbsDown 
                     size={24} 
@@ -131,18 +146,20 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
                     fill={hasVoted === -1 ? "currentColor" : "none"} 
                   />
                 </div>
-                <span className="font-bold text-sm">Pass</span>
+                <span className={`font-bold text-sm ${hasVoted === -1 ? 'text-red-600' : 'text-gray-400'}`}>
+                    Pass
+                </span>
               </button>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center text-gray-400">
-              <div className="flex gap-4">
-                <button className="flex items-center gap-2 hover:text-purple-600 transition text-sm">
+            <div className="mt-8 pt-6 border-t border-white/40 flex justify-between items-center text-gray-500">
+              <div className="flex gap-2">
+                <button className="flex items-center gap-2 hover:text-purple-600 transition text-sm font-medium hover:bg-white/30 px-3 py-1.5 rounded-lg">
                   <Share2 size={16} /> Share
                 </button>
                 <button 
                   onClick={() => onToggleSave(post.id)}
-                  className={`flex items-center gap-2 transition text-sm ${isSaved ? 'text-blue-600 font-bold' : 'hover:text-blue-600'}`}
+                  className={`flex items-center gap-2 transition text-sm font-medium hover:bg-white/30 px-3 py-1.5 rounded-lg ${isSaved ? 'text-blue-600' : 'hover:text-blue-600'}`}
                 >
                   <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? 'Saved' : 'Save'}
                 </button>
@@ -151,7 +168,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
               <button 
                 onClick={handleReport}
                 disabled={hasReported}
-                className={`flex items-center gap-2 transition text-sm ${hasReported ? 'text-red-300' : 'hover:text-red-500'}`}
+                className={`flex items-center gap-2 transition text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-white/30 ${hasReported ? 'text-red-400' : 'hover:text-red-500'}`}
               >
                 <AlertTriangle size={16} /> {hasReported ? 'Reported' : 'Report'}
               </button>
