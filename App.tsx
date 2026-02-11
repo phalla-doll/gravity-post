@@ -11,8 +11,8 @@ import AboutModal from './components/AboutModal';
 import CookingPotLoader from './components/CookingPotLoader';
 
 import { Post, SentimentType } from './types';
-import { generateInitialPosts } from './services/postService';
-import { INITIAL_POSTS_COUNT, SENTIMENT_COLORS } from './constants';
+import { generateInitialPosts } from './services/geminiService';
+import { SENTIMENT_COLORS } from './constants';
 
 // Simple ID helper
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -178,14 +178,14 @@ const App: React.FC = () => {
 
   return (
     <div 
-      className="h-screen w-screen flex flex-col relative overflow-hidden bg-slate-50 font-sans text-slate-900"
+      className="h-screen w-screen overflow-hidden bg-slate-50 font-sans text-slate-900 flex flex-col"
       onClick={() => {
         if (isMenuOpen) setIsMenuOpen(false);
       }}
     >
       
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-20 p-4 pointer-events-none flex justify-between items-start">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-40 p-4 pointer-events-none flex justify-between items-start">
         <button 
           onClick={() => setIsAboutModalOpen(true)}
           className="bg-white/80 backdrop-blur-md rounded-2xl p-2 pr-4 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-2.5 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left"
@@ -231,7 +231,7 @@ const App: React.FC = () => {
                 {isSearchOpen ? (
                     <div className="relative w-full h-full" onClick={(e) => e.stopPropagation()}>
                         <input 
-                            type="text"
+                            type="text" 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search pile..."
@@ -343,14 +343,18 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Physics Canvas */}
-      <main className="flex-1 relative">
-        {isLoading && posts.length === 0 ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-50 animate-in fade-in duration-500">
+      {/* Main Viewport */}
+      <main className="flex-1 relative overflow-hidden">
+        
+        {/* Loading / Empty States Layered on top if needed */}
+        {isLoading && posts.length === 0 && (
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 z-30 animate-in fade-in duration-500 pointer-events-none">
                 <CookingPotLoader />
             </div>
-        ) : filteredPosts.length === 0 && searchQuery ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 p-4 animate-in fade-in zoom-in duration-300">
+        )}
+        
+        {filteredPosts.length === 0 && searchQuery && (
+             <div className="fixed inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 p-4 animate-in fade-in zoom-in duration-300 z-30 pointer-events-none">
                 <div className="bg-white p-6 rounded-full shadow-lg mb-2">
                     <Ghost size={48} className="text-purple-400" />
                 </div>
@@ -359,19 +363,30 @@ const App: React.FC = () => {
                     We couldn't find any thought bubbles matching "<span className="font-semibold text-purple-600">{searchQuery}</span>".
                 </p>
                 <button 
-                  onClick={handleCloseSearch}
-                  className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 transition shadow-md"
+                  onClick={() => {
+                      handleCloseSearch();
+                      // Re-enable pointer events for this button
+                  }}
+                  className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 transition shadow-md pointer-events-auto"
                 >
                   Clear search
                 </button>
             </div>
-        ) : (
-            <PhysicsWorld posts={filteredPosts} onPostClick={setSelectedPost} />
         )}
+
+        {/* The Physics Container - Full Viewport */}
+        <div className="absolute inset-0 w-full h-full" style={{ 
+            background: 'linear-gradient(to bottom, #f8fafc 0%, #dbeafe 100%)'
+        }}>
+           {(!isLoading && !(filteredPosts.length === 0 && searchQuery)) && (
+               <PhysicsWorld posts={filteredPosts} onPostClick={setSelectedPost} />
+           )}
+           
+        </div>
       </main>
 
-      {/* Floating Action Button */}
-      <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none">
+      {/* Fixed Floating Action Button */}
+      <div className="fixed bottom-8 left-0 right-0 z-30 flex justify-center pointer-events-none">
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="pointer-events-auto group relative flex items-center gap-3 pr-8 pl-2 py-2 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-2xl border border-white/60 text-slate-800 rounded-full shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.25)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out"

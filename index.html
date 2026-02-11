@@ -10,26 +10,24 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['"Outfit"', '"Google Sans"', '"Noto Sans Khmer"', 'sans-serif'],
+              sans: ['"Outfit"', '"Google Sans"', 'sans-serif'],
             },
           }
         }
       }
     </script>
-    
-    <!-- Import Google Sans (via CDNFonts) -->
-    <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
 
     <!-- Import Outfit (Primary) and Noto Sans Khmer (Khmer Fallback) from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     
     <style>
       body {
         font-family: 'Outfit', 'Google Sans', 'Noto Sans Khmer', sans-serif;
-        overflow: hidden; /* Prevent native scroll, we use physics */
         background-color: #f3f4f6;
+        /* Scroll is handled by the App container, but we remove hidden to be safe */
+        margin: 0; 
       }
       /* Custom scrollbar for modals */
       .scrollbar-hide::-webkit-scrollbar {

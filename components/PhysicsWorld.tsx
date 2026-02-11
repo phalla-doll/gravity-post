@@ -63,8 +63,10 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
     // Randomize X, ensuring it stays within bounds
     const x = Math.random() * (containerWidth - width) + width / 2;
-    // Start way above the screen to rain down
-    const y = -Math.random() * 2000 - 200; 
+    
+    // Spawn just above the viewport
+    // We spread them vertically slightly (-100 to -600) so they don't all collide instantly if added in bulk
+    const y = -Math.random() * 500 - 100; 
     
     const body = Matter.Bodies.rectangle(x, y, width, height, {
       chamfer: { radius: radius }, 
@@ -83,6 +85,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Use full height of the container (which is now viewport height)
     const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
 
@@ -95,6 +98,8 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       isStatic: true,
       render: { visible: false }
     });
+    
+    // Walls
     const leftWall = Matter.Bodies.rectangle(0 - PHYSICS_CONFIG.WALL_THICKNESS / 2, height / 2, PHYSICS_CONFIG.WALL_THICKNESS, height * 5, { 
       isStatic: true,
       render: { visible: false } 
@@ -211,12 +216,12 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   }, [posts, addBodyForPost, sceneKey]); // Depend on sceneKey to re-populate after reset
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-slate-100 touch-none">
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden touch-none">
       {/* Background Decor */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
+      <div className="absolute inset-0 opacity-5 pointer-events-none sticky top-0">
          <div className="absolute top-0 left-0 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-         <div className="absolute -bottom-8 left-20 w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+         <div className="absolute bottom-20 left-20 w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
       {renderedPosts.map((post) => {
