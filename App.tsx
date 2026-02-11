@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost, ChevronLeft, ChevronRight } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
 // Use the new Dynamic component (replaces old CreatePostModal logic)
@@ -55,6 +55,7 @@ const App: React.FC = () => {
   // Search State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Language State
   const [language, setLanguage] = useState<'en' | 'km'>('en');
@@ -99,6 +100,17 @@ const App: React.FC = () => {
 
     fetchPosts();
   }, [page]);
+
+  // Focus effect for search
+  useEffect(() => {
+    if (isSearchOpen) {
+        // Delay slightly to match animation
+        const timer = setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 300);
+        return () => clearTimeout(timer);
+    }
+  }, [isSearchOpen]);
 
   const handleNextPage = () => {
     setPage(prev => prev + 1);
@@ -260,39 +272,61 @@ const App: React.FC = () => {
                 <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
              </button>
 
-             {/* Search Button / Expandable Input */}
-             <div className={`relative transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] ${isSearchOpen ? 'w-64' : 'w-auto'}`}>
-                {isSearchOpen ? (
-                    <div className="relative w-full h-full" onClick={(e) => e.stopPropagation()}>
-                        <input 
-                            type="text" 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search pile..."
-                            autoFocus
-                            className="w-full pl-10 pr-10 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-sm border border-purple-300 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-200 text-sm transition-all"
-                            style={{ height: '46px' }}
-                        />
-                        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-500" />
-                        <button 
-                            onClick={handleCloseSearch}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 transition"
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-                ) : (
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsSearchOpen(true);
-                            setIsMenuOpen(false); // Close menu if open
-                        }}
-                        className="p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white text-slate-600 transition flex items-center justify-center"
-                    >
-                        <Search size={20} />
-                    </button>
-                )}
+             {/* Search Component - Dynamic Expansion */}
+             <div 
+                className={`
+                    relative h-[46px] bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 
+                    flex items-center overflow-hidden
+                    transition-all ease-[cubic-bezier(0.25,1,0.5,1)]
+                    ${isSearchOpen ? 'bg-white ring-2 ring-purple-100 border-purple-300' : 'hover:bg-white cursor-pointer'}
+                `}
+                style={{
+                    width: isSearchOpen ? '260px' : '46px',
+                    transitionDuration: '0.5s'
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isSearchOpen) {
+                        setIsSearchOpen(true);
+                        setIsMenuOpen(false);
+                    }
+                }}
+             >
+                {/* Search Icon */}
+                <div className="absolute left-0 top-0 bottom-0 w-[46px] flex items-center justify-center pointer-events-none z-10">
+                    <Search 
+                        size={20} 
+                        className={`transition-colors duration-300 ${isSearchOpen ? 'text-purple-500' : 'text-slate-600'}`} 
+                    />
+                </div>
+
+                {/* Input Field */}
+                <input 
+                    ref={searchInputRef}
+                    type="text" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search pile..."
+                    className={`
+                        w-full h-full bg-transparent border-none outline-none pl-12 pr-10 text-sm text-slate-700 placeholder-slate-400
+                        transition-opacity duration-300
+                        ${isSearchOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
+                    `}
+                />
+
+                {/* Close Button */}
+                 <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleCloseSearch();
+                    }}
+                    className={`
+                        absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 transition-all duration-300
+                        ${isSearchOpen ? 'opacity-100 rotate-0 scale-100 delay-100' : 'opacity-0 rotate-90 scale-50 pointer-events-none'}
+                    `}
+                >
+                    <X size={16} />
+                </button>
              </div>
              
              <div className="relative">
