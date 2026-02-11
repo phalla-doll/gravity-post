@@ -283,7 +283,7 @@ const App: React.FC = () => {
            </div>
 
            <div className="whitespace-nowrap">
-             <h1 className="text-xl font-black tracking-tight text-slate-800 leading-none">
+             <h1 className="text-xl font-black font-bold tracking-tight text-slate-800 leading-none">
                Gravity
              </h1>
              <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">The Social Pile</p>
