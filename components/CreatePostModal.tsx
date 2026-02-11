@@ -13,7 +13,7 @@ const MOOD_OPTIONS = [
   { type: SentimentType.HAPPY, label: 'Happy', emoji: '😄' },
   { type: SentimentType.EXCITING, label: 'Excited', emoji: '🤩' },
   { type: SentimentType.LOVING, label: 'Loving', emoji: '😍' },
-  { type: SentimentType.NEUTRAL, label: 'Chill', emoji: '😐' },
+  { type: SentimentType.NEUTRAL, label: 'Chill', emoji: '☺️' },
   { type: SentimentType.SAD, label: 'Sad', emoji: '😢' },
   { type: SentimentType.ANGRY, label: 'Angry', emoji: '😡' },
 ];
