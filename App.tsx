@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost } from 'lucide-react';
+import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost, ChevronLeft, ChevronRight } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
 import CreatePostModal from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
@@ -34,6 +34,9 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
+  // Pagination State
+  const [page, setPage] = useState(1);
+  
   // User Profile State
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: "Guest User",
@@ -55,11 +58,13 @@ const App: React.FC = () => {
   // Language State
   const [language, setLanguage] = useState<'en' | 'km'>('en');
 
-  // Initialize with Gemini data
+  // Fetch posts when page changes
   useEffect(() => {
-    const init = async () => {
+    const fetchPosts = async () => {
       setIsLoading(true);
-      const generated = await generateInitialPosts();
+      setPosts([]); // Clear to trigger re-fall/empty jar effect
+      
+      const generated = await generateInitialPosts(100); // Fetch 100 random posts per page
       
       const newPosts: Post[] = generated.map((g, index) => ({
         id: generateId(),
@@ -69,27 +74,38 @@ const App: React.FC = () => {
         createdAt: Date.now(),
         upvotes: Math.floor(Math.random() * 50),
         isFlagged: false,
-        // Mark first 5 posts as "mine" for demo purposes
-        isMine: index < 5 
+        // Mark first 5 posts as "mine" for demo purposes on first page
+        isMine: page === 1 && index < 5 
       }));
 
-      // Add a welcome post
-      newPosts.unshift({
-        id: 'welcome-post',
-        text: "Welcome to Gravity! Drop a thought.",
-        sentiment: SentimentType.HAPPY,
-        color: SENTIMENT_COLORS[SentimentType.HAPPY],
-        createdAt: Date.now(),
-        upvotes: 100,
-        isFlagged: false,
-        isMine: false
-      });
+      // Add a welcome post only on page 1
+      if (page === 1) {
+        newPosts.unshift({
+          id: 'welcome-post',
+          text: "Welcome to Gravity! Drop a thought.",
+          sentiment: SentimentType.HAPPY,
+          color: SENTIMENT_COLORS[SentimentType.HAPPY],
+          createdAt: Date.now(),
+          upvotes: 100,
+          isFlagged: false,
+          isMine: false
+        });
+      }
 
       setPosts(newPosts);
       setIsLoading(false);
     };
-    init();
-  }, []);
+
+    fetchPosts();
+  }, [page]);
+
+  const handleNextPage = () => {
+    setPage(prev => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    setPage(prev => Math.max(1, prev - 1));
+  };
 
   const handleCreatePost = async (text: string, sentiment: SentimentType) => {
     const newPost: Post = {
@@ -131,14 +147,17 @@ const App: React.FC = () => {
     });
   }, []);
 
-  const refreshPile = useCallback(async () => {
-      setPosts([]); // Clear to trigger re-fall
-      setIsLoading(true);
-      // Reset search when refreshing
-      setSearchQuery('');
-      setTimeout(async () => {
-          const generated = await generateInitialPosts();
-          const newPosts: Post[] = generated.map((g, index) => ({
+  const refreshPile = useCallback(() => {
+     // Re-trigger the effect by technically resetting page, or just force fetching.
+     // For simple UX, let's just empty and re-fetch current page logic
+     setIsLoading(true);
+     setPosts([]);
+     setSearchQuery('');
+     
+     // Quick timeout to allow UI to show empty state before refetching
+     setTimeout(async () => {
+         const generated = await generateInitialPosts(100);
+         const newPosts: Post[] = generated.map((g, index) => ({
             id: generateId(),
             text: g.text,
             sentiment: g.sentiment,
@@ -146,12 +165,26 @@ const App: React.FC = () => {
             createdAt: Date.now(),
             upvotes: Math.floor(Math.random() * 50),
             isFlagged: false,
-            isMine: index < 5
-          }));
-          setPosts(newPosts);
-          setIsLoading(false);
-      }, 500);
-  }, []);
+            isMine: page === 1 && index < 5
+         }));
+         
+         if (page === 1) {
+             newPosts.unshift({
+                id: 'welcome-post',
+                text: "Welcome to Gravity! Drop a thought.",
+                sentiment: SentimentType.HAPPY,
+                color: SENTIMENT_COLORS[SentimentType.HAPPY],
+                createdAt: Date.now(),
+                upvotes: 100,
+                isFlagged: false,
+                isMine: false
+             });
+         }
+         
+         setPosts(newPosts);
+         setIsLoading(false);
+     }, 500);
+  }, [page]);
 
   // Filter posts based on search query
   const filteredPosts = useMemo(() => {
@@ -378,6 +411,34 @@ const App: React.FC = () => {
         <div className="absolute inset-0 w-full h-full" style={{ 
             background: 'linear-gradient(to bottom, #f8fafc 0%, #dbeafe 100%)'
         }}>
+           {/* Pagination Controls - The Multiverse Switchers */}
+           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none z-20">
+              {page > 1 && (
+                <button 
+                    onClick={handlePrevPage}
+                    className="pointer-events-auto p-3 bg-white/40 hover:bg-white/80 backdrop-blur-md border border-white/50 rounded-full shadow-lg text-slate-700 hover:scale-110 active:scale-90 transition-all group"
+                    title="Previous Universe"
+                >
+                    <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                </button>
+              )}
+           </div>
+
+           <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none z-20">
+              <button 
+                  onClick={handleNextPage}
+                  className="pointer-events-auto p-3 bg-white/40 hover:bg-white/80 backdrop-blur-md border border-white/50 rounded-full shadow-lg text-slate-700 hover:scale-110 active:scale-90 transition-all group"
+                  title="Next Universe"
+              >
+                  <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+           </div>
+
+           {/* Page Indicator */}
+           <div className="absolute top-24 right-6 px-3 py-1 bg-white/30 backdrop-blur-sm rounded-full border border-white/40 text-[10px] font-bold tracking-widest text-slate-400 uppercase pointer-events-none z-20">
+              Dimension {page}
+           </div>
+
            {(!isLoading && !(filteredPosts.length === 0 && searchQuery)) && (
                <PhysicsWorld posts={filteredPosts} onPostClick={setSelectedPost} />
            )}

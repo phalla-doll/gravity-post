@@ -65,8 +65,8 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     const x = Math.random() * (containerWidth - width) + width / 2;
     
     // Spawn just above the viewport
-    // We spread them vertically slightly (-100 to -600) so they don't all collide instantly if added in bulk
-    const y = -Math.random() * 500 - 100; 
+    // Increased range (-2500) to allow 100 items to fall in a stream rather than a clump
+    const y = -Math.random() * 2500 - 200; 
     
     const body = Matter.Bodies.rectangle(x, y, width, height, {
       chamfer: { radius: radius }, 
