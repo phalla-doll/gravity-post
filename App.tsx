@@ -51,6 +51,9 @@ const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Language State
+  const [language, setLanguage] = useState<'en' | 'km'>('en');
+
   // Initialize with Gemini data
   useEffect(() => {
     const init = async () => {
@@ -303,7 +306,30 @@ const App: React.FC = () => {
                     >
                       <Settings size={18} /> Settings
                     </button>
+
                     <div className="h-px bg-gray-100 my-1" />
+                    
+                    {/* Language Toggle */}
+                    <div className="px-4 py-2">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Language</p>
+                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setLanguage('en'); }}
+                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'en' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                English
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setLanguage('km'); }}
+                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${language === 'km' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Khmer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="h-px bg-gray-100 my-1" />
+
                     <button 
                         onClick={() => handleMenuClick('logout')}
                         className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
