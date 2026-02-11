@@ -106,7 +106,7 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
                     <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg">
                         <Plus size={18} />
                     </div>
-                    <span className="font-bold text-slate-800 tracking-tight">Drop Thought</span>
+                    <span className="font-semibold text-slate-800 tracking-tight">Drop Thought</span>
                 </div>
 
                 {/* STATE 2: EXPANDED CONTENT */}
@@ -124,7 +124,7 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
                                     <ArrowLeft size={20} />
                                 </button>
                              )}
-                             <h3 className="font-black text-lg text-slate-800 tracking-tight">
+                             <h3 className="font-black font-semibold text-lg text-slate-800 tracking-tight">
                                 {step === 'mood' ? 'How are you feeling?' : 'Speak your mind'}
                              </h3>
                         </div>
