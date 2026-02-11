@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost, ChevronLeft, ChevronRight } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
-import CreatePostModal from './components/CreatePostModal';
+// Use the new Dynamic component (replaces old CreatePostModal logic)
+import DynamicPostCreator from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
 import ProfileModal from './components/ProfileModal';
 import SettingsModal from './components/SettingsModal';
@@ -29,7 +30,7 @@ interface UserProfile {
 const App: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // Removed isCreateModalOpen state as the new component handles itself
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -434,8 +435,8 @@ const App: React.FC = () => {
               </button>
            </div>
 
-           {/* Page Indicator */}
-           <div className="absolute top-24 right-6 px-3 py-1 bg-white/30 backdrop-blur-sm rounded-full border border-white/40 text-[10px] font-bold tracking-widest text-slate-400 uppercase pointer-events-none z-20">
+           {/* Page Indicator - Moved to Bottom Center */}
+           <div className="absolute bottom-10 right-1/2 translate-x-1/2 px-4 py-1.5 bg-white/30 backdrop-blur-md rounded-full border border-white/40 text-[10px] font-bold tracking-widest text-slate-500 uppercase pointer-events-none z-20 shadow-sm">
               Dimension {page}
            </div>
 
@@ -446,25 +447,12 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Fixed Floating Action Button */}
-      <div className="fixed bottom-8 left-0 right-0 z-30 flex justify-center pointer-events-none">
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="pointer-events-auto group relative flex items-center gap-3 pr-8 pl-2 py-2 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-2xl border border-white/60 text-slate-800 rounded-full shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.25)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
-        >
-           <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg group-hover:bg-gradient-to-br group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-500">
-             <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]" />
-           </div>
-           <span className="font-bold text-lg tracking-tight text-slate-900">Drop Thought</span>
-        </button>
-      </div>
+      {/* Replaced fixed bottom button with the Dynamic Post Creator */}
+      {/* This component self-renders as a button and expands into the modal */}
+      <DynamicPostCreator onSubmit={handleCreatePost} />
 
       {/* Creation & Detail Modals */}
-      <CreatePostModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
-        onSubmit={handleCreatePost} 
-      />
+      {/* CreatePostModal is removed as it's now integrated via DynamicPostCreator above */}
 
       <PostDetailModal 
         post={selectedPost} 

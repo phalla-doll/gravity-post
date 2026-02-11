@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { X, Send, Loader2, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Send, Loader2, ArrowLeft, Plus } from 'lucide-react';
 import { SentimentType } from '../types';
 import { SENTIMENT_COLORS } from '../constants';
 
 interface CreatePostModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  // We no longer need isOpen/onClose props as this component manages its own expansion state
   onSubmit: (text: string, sentiment: SentimentType) => Promise<void>;
 }
 
@@ -18,156 +17,182 @@ const MOOD_OPTIONS = [
   { type: SentimentType.ANGRY, label: 'Angry', emoji: '😡' },
 ];
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'mood' | 'text'>('mood');
   const [selectedMood, setSelectedMood] = useState<SentimentType | null>(null);
-  const [hoveredMood, setHoveredMood] = useState<SentimentType | null>(null);
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Refs for focusing
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Reset state when modal opens/closes
   useEffect(() => {
-    if (isOpen) {
-      setStep('mood');
-      setSelectedMood(null);
-      setHoveredMood(null);
-      setText('');
-      setIsSubmitting(false);
+    if (!isOpen) {
+        // Reset state when closed fully
+        const timer = setTimeout(() => {
+            setStep('mood');
+            setSelectedMood(null);
+            setText('');
+            setIsSubmitting(false);
+        }, 500); // Wait for shrink animation
+        return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+      if (step === 'text' && isOpen) {
+          // Slight delay to allow animation to settle before focusing
+          setTimeout(() => {
+              inputRef.current?.focus();
+          }, 400);
+      }
+  }, [step, isOpen]);
 
   const handleMoodSelect = (mood: SentimentType) => {
     setSelectedMood(mood);
     setStep('text');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!text.trim() || !selectedMood) return;
 
     setIsSubmitting(true);
     await onSubmit(text, selectedMood);
     setIsSubmitting(false);
-    onClose();
+    setIsOpen(false);
   };
 
-  const handleBack = () => {
-    setStep('mood');
+  const handleClose = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsOpen(false);
   };
+
+  // Dynamic Island Styles
+  const islandClasses = isOpen 
+    ? "w-[90vw] max-w-md h-[420px] rounded-[32px] bg-white/95 border-white/80" 
+    : "w-[170px] h-[52px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
+
+  // When open, we might want to color the background based on mood
+  const backgroundStyle = isOpen && selectedMood 
+    ? { background: `linear-gradient(to bottom right, #ffffff, ${SENTIMENT_COLORS[selectedMood]}30)` }
+    : {};
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={onClose}
-    >
-      <div 
-        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="p-4 border-b border-white/40 flex justify-between items-center bg-white/30 shrink-0">
-          <div className="flex items-center gap-2">
-            {step === 'text' && (
-              <button 
-                onClick={handleBack}
-                className="p-1.5 hover:bg-white/50 rounded-full transition mr-1 text-gray-700"
-              >
-                <ArrowLeft size={18} />
-              </button>
-            )}
-            <h2 className="text-xl font-bold text-gray-800">
-              {step === 'mood' ? 'Pick a Vibe' : 'Speak Your Mind'}
-            </h2>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition text-gray-600">
-            <X size={20} />
-          </button>
-        </div>
-        
-        {/* Content */}
-        <div className="p-6 overflow-y-auto">
-          {step === 'mood' ? (
-            <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-left duration-300">
-              {MOOD_OPTIONS.map((option) => {
-                const isHovered = hoveredMood === option.type;
-                const baseColor = SENTIMENT_COLORS[option.type];
-                
-                // For lighter colors (Happy, Exciting), use dark text on hover. For others, use white.
-                const isLightColor = option.type === SentimentType.HAPPY || option.type === SentimentType.EXCITING;
+    <>
+        {/* Backdrop - Only visible when open */}
+        <div 
+            className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-500 ease-in-out ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => setIsOpen(false)}
+        />
 
-                return (
-                  <button
-                    key={option.type}
-                    onClick={() => handleMoodSelect(option.type)}
-                    onMouseEnter={() => setHoveredMood(option.type)}
-                    onMouseLeave={() => setHoveredMood(null)}
-                    className="flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ease-out backdrop-blur-sm"
-                    style={{
-                      backgroundColor: isHovered ? baseColor : 'rgba(255, 255, 255, 0.4)',
-                      borderColor: isHovered ? baseColor : 'rgba(255, 255, 255, 0.6)',
-                      transform: isHovered ? 'translateY(-2px)' : 'none',
-                      boxShadow: isHovered ? `0 10px 25px -5px ${baseColor}80` : 'none'
-                    }}
-                  >
-                    <div 
-                      className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 transition-colors duration-300"
-                      style={{ 
-                        backgroundColor: isHovered ? 'rgba(255,255,255,0.2)' : baseColor + '40'
-                      }}
-                    >
-                      {option.emoji}
-                    </div>
-                    <span 
-                      className="font-bold transition-colors duration-300"
-                      style={{ color: isHovered ? (isLightColor ? '#374151' : 'white') : '#374151' }}
-                    >
-                      {option.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 animate-in slide-in-from-right duration-300">
-              <div className="relative">
+        {/* The Dynamic Container */}
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center">
+            <div 
+                className={`
+                    relative overflow-hidden shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] border backdrop-blur-2xl
+                    transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+                    ${islandClasses}
+                `}
+                style={backgroundStyle}
+                onClick={() => !isOpen && setIsOpen(true)}
+            >
+                {/* STATE 1: COLLAPSED BUTTON */}
                 <div 
-                  className="absolute -top-3 left-4 px-2 text-xs font-bold uppercase tracking-wider rounded-full py-0.5 border shadow-sm z-10"
-                  style={{ 
-                    backgroundColor: selectedMood ? SENTIMENT_COLORS[selectedMood] : '#eee',
-                    borderColor: 'rgba(255,255,255,0.5)'
-                  }}
+                    className={`absolute inset-0 flex items-center justify-center gap-3 transition-opacity duration-300 ${isOpen ? 'opacity-0 pointer-events-none delay-0' : 'opacity-100 delay-100'}`}
                 >
-                   {MOOD_OPTIONS.find(m => m.type === selectedMood)?.emoji} {MOOD_OPTIONS.find(m => m.type === selectedMood)?.label}
+                    <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg">
+                        <Plus size={18} />
+                    </div>
+                    <span className="font-bold text-slate-800 tracking-tight">Drop Thought</span>
                 </div>
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Type something playful..."
-                  className="w-full h-40 p-4 pt-6 rounded-xl border border-white/60 focus:border-purple-400 focus:ring-0 resize-none bg-white/40 backdrop-blur-sm text-lg transition-all placeholder-gray-400"
-                  maxLength={140}
-                  autoFocus
-                />
-                <div className="text-right text-xs text-gray-500 mt-1 font-medium">
-                  {text.length}/140
-                </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={!text.trim() || isSubmitting}
-                className="w-full py-4 px-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-              >
-                {isSubmitting ? <Loader2 className="animate-spin" /> : <Send size={18} />}
-                Drop into Pile
-              </button>
-            </form>
-          )}
+                {/* STATE 2: EXPANDED CONTENT */}
+                <div 
+                    className={`w-full h-full flex flex-col transition-opacity duration-500 ${isOpen ? 'opacity-100 delay-150' : 'opacity-0 pointer-events-none'}`}
+                >
+                    {/* Header inside Island */}
+                    <div className="flex justify-between items-center p-5 pb-2 shrink-0">
+                        <div className="flex items-center gap-2">
+                             {step === 'text' && (
+                                <button 
+                                    onClick={() => setStep('mood')}
+                                    className="p-2 hover:bg-black/5 rounded-full transition text-slate-500"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
+                             )}
+                             <h3 className="font-black text-lg text-slate-800 tracking-tight">
+                                {step === 'mood' ? 'How are you feeling?' : 'Speak your mind'}
+                             </h3>
+                        </div>
+                        <button 
+                            onClick={handleClose}
+                            className="p-2 bg-black/5 hover:bg-black/10 rounded-full text-slate-500 transition"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="flex-1 relative overflow-hidden">
+                        
+                        {/* MOOD GRID */}
+                        <div 
+                            className={`absolute inset-0 p-5 pt-2 grid grid-cols-2 gap-3 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${step === 'mood' ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}
+                        >
+                            {MOOD_OPTIONS.map((option) => (
+                                <button
+                                    key={option.type}
+                                    onClick={(e) => { e.stopPropagation(); handleMoodSelect(option.type); }}
+                                    className="relative group overflow-hidden rounded-2xl border border-transparent hover:border-black/5 transition-all duration-300"
+                                    style={{ backgroundColor: `${SENTIMENT_COLORS[option.type]}20` }}
+                                >
+                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundColor: SENTIMENT_COLORS[option.type] }} />
+                                    
+                                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
+                                        <span className="text-3xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">{option.emoji}</span>
+                                        <span className="text-xs font-bold text-slate-700 group-hover:text-white transition-colors uppercase tracking-wider">{option.label}</span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* TEXT INPUT */}
+                        <div 
+                             className={`absolute inset-0 p-5 pt-0 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${step === 'text' ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
+                        >
+                             <div className="relative flex-1">
+                                <textarea
+                                    ref={inputRef}
+                                    value={text}
+                                    onChange={(e) => setText(e.target.value)}
+                                    placeholder="Type something..."
+                                    className="w-full h-full p-4 bg-white/50 rounded-2xl border-2 border-transparent focus:border-slate-200 focus:bg-white resize-none text-lg text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all"
+                                    maxLength={140}
+                                />
+                                <div className="absolute bottom-4 right-4 text-xs font-bold text-slate-400 bg-white/80 px-2 py-1 rounded-lg">
+                                    {text.length}/140
+                                </div>
+                             </div>
+
+                             <button
+                                onClick={(e) => handleSubmit(e)}
+                                disabled={!text.trim() || isSubmitting}
+                                className="mt-4 w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                              >
+                                {isSubmitting ? <Loader2 className="animate-spin" /> : <Send size={18} />}
+                                Drop It
+                              </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
+    </>
   );
 };
 
-export default CreatePostModal;
+export default DynamicPostCreator;
