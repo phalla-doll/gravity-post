@@ -232,7 +232,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
           >
             {/* Inner Visual Container - Handles color, shape, and hover effects */}
             <div 
-              className="w-full h-full flex items-center justify-center px-3 py-1 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
+              className="w-full h-full flex items-center justify-center px-3 py-0.5 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
               style={{
                 backgroundColor: post.color, 
                 borderRadius: `${radius}px`,

@@ -21,6 +21,7 @@ const MOOD_OPTIONS = [
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [step, setStep] = useState<'mood' | 'text'>('mood');
   const [selectedMood, setSelectedMood] = useState<SentimentType | null>(null);
+  const [hoveredMood, setHoveredMood] = useState<SentimentType | null>(null);
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,6 +30,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
     if (isOpen) {
       setStep('mood');
       setSelectedMood(null);
+      setHoveredMood(null);
       setText('');
       setIsSubmitting(false);
     }
@@ -88,24 +90,41 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         <div className="p-6 overflow-y-auto">
           {step === 'mood' ? (
             <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-left duration-300">
-              {MOOD_OPTIONS.map((option) => (
-                <button
-                  key={option.type}
-                  onClick={() => handleMoodSelect(option.type)}
-                  className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-gray-100 hover:border-transparent hover:shadow-lg hover:scale-105 transition-all duration-200 group"
-                  style={{
-                    backgroundColor: 'white',
-                  }}
-                >
-                  <div 
-                    className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 transition-transform group-hover:scale-110"
-                    style={{ backgroundColor: SENTIMENT_COLORS[option.type] + '40' }} // 25% opacity
+              {MOOD_OPTIONS.map((option) => {
+                const isHovered = hoveredMood === option.type;
+                const baseColor = SENTIMENT_COLORS[option.type];
+                
+                return (
+                  <button
+                    key={option.type}
+                    onClick={() => handleMoodSelect(option.type)}
+                    onMouseEnter={() => setHoveredMood(option.type)}
+                    onMouseLeave={() => setHoveredMood(null)}
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 ease-out"
+                    style={{
+                      backgroundColor: isHovered ? baseColor : 'white',
+                      borderColor: isHovered ? baseColor : '#f3f4f6',
+                      transform: isHovered ? 'translateY(-2px)' : 'none',
+                      boxShadow: isHovered ? `0 10px 25px -5px ${baseColor}80` : 'none'
+                    }}
                   >
-                    {option.emoji}
-                  </div>
-                  <span className="font-bold text-gray-700">{option.label}</span>
-                </button>
-              ))}
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 transition-colors duration-300"
+                      style={{ 
+                        backgroundColor: isHovered ? 'rgba(255,255,255,0.2)' : baseColor + '40'
+                      }}
+                    >
+                      {option.emoji}
+                    </div>
+                    <span 
+                      className="font-bold transition-colors duration-300"
+                      style={{ color: isHovered ? (option.type === SentimentType.HAPPY ? '#374151' : 'white') : '#374151' }}
+                    >
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 animate-in slide-in-from-right duration-300">

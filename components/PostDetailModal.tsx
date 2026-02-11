@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Post } from '../types';
-import { X, ThumbsUp, ThumbsDown, AlertTriangle, Share2 } from 'lucide-react';
+import { X, ThumbsUp, ThumbsDown, AlertTriangle, Share2, Bookmark } from 'lucide-react';
 
 interface PostDetailModalProps {
   post: Post | null;
@@ -12,6 +12,7 @@ interface PostDetailModalProps {
 const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote, onReport }) => {
   const [hasVoted, setHasVoted] = useState(0); // -1, 0, 1
   const [hasReported, setHasReported] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   if (!post) return null;
 
@@ -24,6 +25,10 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
   const handleReport = () => {
     onReport(post.id);
     setHasReported(true);
+  };
+
+  const handleSave = () => {
+    setIsSaved(!isSaved);
   };
 
   return (
@@ -84,10 +89,19 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
               </button>
             </div>
 
-            <div className="mt-8 pt-6 border-t flex justify-between text-gray-400">
-              <button className="flex items-center gap-2 hover:text-purple-600 transition text-sm">
-                <Share2 size={16} /> Share
-              </button>
+            <div className="mt-8 pt-6 border-t flex justify-between items-center text-gray-400">
+              <div className="flex gap-4">
+                <button className="flex items-center gap-2 hover:text-purple-600 transition text-sm">
+                  <Share2 size={16} /> Share
+                </button>
+                <button 
+                  onClick={handleSave}
+                  className={`flex items-center gap-2 transition text-sm ${isSaved ? 'text-blue-600 font-semibold' : 'hover:text-blue-600'}`}
+                >
+                  <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? 'Saved' : 'Save'}
+                </button>
+              </div>
+
               <button 
                 onClick={handleReport}
                 disabled={hasReported}
