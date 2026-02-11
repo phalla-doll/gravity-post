@@ -59,8 +59,12 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
         </div>
 
         <div className="p-8 text-center -mt-6 bg-white rounded-t-3xl relative">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-              {new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })} • {post.sentiment}
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
+              <span>{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}</span>
+              <span>•</span>
+              <span>{post.sentiment}</span>
+              <span>•</span>
+              <span className="font-mono text-gray-300">#{post.id.slice(-6)}</span>
             </div>
             
             <p className="text-2xl font-bold text-gray-800 leading-tight mb-8">
@@ -96,7 +100,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
                 </button>
                 <button 
                   onClick={handleSave}
-                  className={`flex items-center gap-2 transition text-sm ${isSaved ? 'text-blue-600 font-semibold' : 'hover:text-blue-600'}`}
+                  className={`flex items-center gap-2 transition text-sm ${isSaved ? 'text-blue-600 font-bold' : 'hover:text-blue-600'}`}
                 >
                   <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? 'Saved' : 'Save'}
                 </button>

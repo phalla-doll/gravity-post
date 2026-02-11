@@ -8,14 +8,14 @@ interface PhysicsWorldProps {
   onPostClick: (post: Post) => void;
 }
 
-// 5 Distinct sizes based on text length
+// 5 Distinct sizes based on text length - Scaled down for compacter look
 const getPostSize = (text: string) => {
   const len = text.length;
-  if (len <= 15) return { width: 100, height: 100, radius: 50, fontSize: '0.9rem' };      // XS: Circle
-  if (len <= 40) return { width: 180, height: 90, radius: 45, fontSize: '0.95rem' };      // S: Small Pill
-  if (len <= 80) return { width: 240, height: 110, radius: 55, fontSize: '1rem' };        // M: Medium Pill
-  if (len <= 120) return { width: 300, height: 140, radius: 70, fontSize: '1.1rem' };     // L: Large Blob
-  return { width: 360, height: 160, radius: 80, fontSize: '1.2rem' };                     // XL: Huge Cloud
+  if (len <= 15) return { width: 80, height: 80, radius: 40, fontSize: '0.75rem' };      // XS: Circle
+  if (len <= 40) return { width: 140, height: 70, radius: 35, fontSize: '0.8rem' };      // S: Small Pill
+  if (len <= 80) return { width: 190, height: 90, radius: 45, fontSize: '0.85rem' };     // M: Medium Pill
+  if (len <= 120) return { width: 240, height: 110, radius: 55, fontSize: '0.9rem' };    // L: Large Blob
+  return { width: 280, height: 130, radius: 65, fontSize: '1rem' };                      // XL: Huge Cloud
 };
 
 const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
@@ -232,7 +232,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
           >
             {/* Inner Visual Container - Handles color, shape, and hover effects */}
             <div 
-              className="w-full h-full flex items-center justify-center px-3 py-0.5 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
+              className="w-full h-full flex items-center justify-center px-2 py-0.5 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
               style={{
                 backgroundColor: post.color, 
                 borderRadius: `${radius}px`,
