@@ -31,6 +31,9 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   
   // State to force re-render of DOM elements when physics updates
   const [renderedPosts, setRenderedPosts] = useState<Post[]>([]);
+  
+  // Track which post is being dragged
+  const [draggedId, setDraggedId] = useState<string | null>(null);
 
   // State to trigger re-initialization on resize
   const [sceneKey, setSceneKey] = useState(0);
@@ -119,6 +122,17 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     mouse.element.removeEventListener("DOMMouseScroll", (mouse as any).mousewheel);
 
     Matter.World.add(engine.world, mouseConstraint);
+    
+    // Add drag events for visual feedback
+    Matter.Events.on(mouseConstraint, 'startdrag', (event: any) => {
+      setDraggedId(event.body.label);
+      if (containerRef.current) containerRef.current.style.cursor = 'grabbing';
+    });
+
+    Matter.Events.on(mouseConstraint, 'enddrag', () => {
+      setDraggedId(null);
+      if (containerRef.current) containerRef.current.style.cursor = 'default';
+    });
     // -------------------------------
 
     // Runner
@@ -207,6 +221,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
       {renderedPosts.map((post) => {
         const { width, height, radius, fontSize } = getPostSize(post.text);
+        const isDragged = draggedId === post.id;
         
         return (
           <div
@@ -227,12 +242,15 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
               }
               clickStartRef.current = null;
             }}
-            className="absolute top-0 left-0 cursor-grab active:cursor-grabbing select-none will-change-transform z-10"
+            className={`absolute top-0 left-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
             style={{ width, height }}
           >
             {/* Inner Visual Container - Handles color, shape, and hover effects */}
             <div 
-              className="w-full h-full flex items-center justify-center px-2 py-0.5 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
+              className={`
+                w-full h-full flex items-center justify-center px-2 py-0.5 text-center transition-all duration-300 ease-out border-2 border-black/5
+                ${isDragged ? 'shadow-2xl scale-110 ring-4 ring-white/60 brightness-105' : 'shadow-md hover:shadow-xl hover:scale-105 active:scale-95'}
+              `}
               style={{
                 backgroundColor: post.color, 
                 borderRadius: `${radius}px`,
@@ -240,7 +258,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
                 fontWeight: 600,
                 fontSize: fontSize,
                 lineHeight: '1.2',
-                boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.1), 0 4px 10px rgba(0, 0, 0, 0.1)'
+                boxShadow: isDragged ? '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)' : 'inset 0 -3px 0 rgba(0,0,0,0.1), 0 4px 10px rgba(0, 0, 0, 0.1)'
               }}
             >
               <span className="line-clamp-3 overflow-hidden text-ellipsis pointer-events-none">
