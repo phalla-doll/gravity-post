@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Info, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
 import CreatePostModal from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Initialize with Gemini data
   useEffect(() => {
@@ -100,7 +101,10 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col relative overflow-hidden bg-slate-50 font-sans text-slate-900">
+    <div 
+      className="h-screen w-screen flex flex-col relative overflow-hidden bg-slate-50 font-sans text-slate-900"
+      onClick={() => isMenuOpen && setIsMenuOpen(false)}
+    >
       
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-20 p-4 pointer-events-none flex justify-between items-start">
@@ -111,18 +115,58 @@ const App: React.FC = () => {
            <p className="text-sm text-slate-500 font-medium">The social pile.</p>
         </div>
         
-        <div className="flex gap-2 pointer-events-auto">
+        <div className="flex gap-2 pointer-events-auto items-start">
              <button 
-                onClick={refreshPile}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  refreshPile();
+                }}
                 className="p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white text-slate-600 transition"
                 title="Refresh Pile"
              >
                 <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
              </button>
-             <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-white/50 text-xs text-slate-500 flex items-center gap-2">
-                <Info size={14} />
-                <span>Tap a bubble to read</span>
-            </div>
+             
+             <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMenuOpen(!isMenuOpen);
+                  }}
+                  className={`p-3 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white transition flex items-center justify-center ${isMenuOpen ? 'bg-white text-purple-600 ring-2 ring-purple-100' : 'bg-white/80 text-slate-600'}`}
+                >
+                  <Menu size={20} />
+                </button>
+
+                {isMenuOpen && (
+                  <div 
+                    className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden py-2 z-50 animate-in slide-in-from-top-2 fade-in duration-200 origin-top-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="px-4 py-3 border-b border-gray-100 mb-1">
+                      <p className="text-sm font-bold text-gray-900">Guest User</p>
+                      <p className="text-xs text-gray-500 truncate">user@gravity.app</p>
+                    </div>
+                    
+                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                      <User size={18} /> Profile
+                    </button>
+                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                      <FileText size={18} /> My Posts
+                    </button>
+                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                      <Bookmark size={18} /> Saved
+                    </button>
+                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                      <Settings size={18} /> Settings
+                    </button>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <button className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                      <LogOut size={18} /> Logout
+                    </button>
+                  </div>
+                )}
+             </div>
         </div>
       </header>
 
