@@ -11,58 +11,69 @@ The platform transforms digital content into "tangible" objects.
 *   **Playful Interaction:** Users can drag, throw, and disrupt the pile of posts.
 *   **Mood-Centric:** Every post starts with a "Vibe" check, coloring the post based on the sentiment (Happy, Sad, Exciting, etc.).
 
+## 🎨 Visual Identity: Glassmorphism
+
+The application features a premium **Glassmorphism** design language:
+*   **Frosted Glass:** Modals and buttons use semi-transparent backgrounds with `backdrop-blur` to interact with the colorful elements behind them.
+*   **Soft Gradients:** Subtle white-to-transparent gradients create depth and volume.
+*   **Vibrant Moods:** The interface glows with the specific color of the content (e.g., Amber for Happy, Pink for Loving), using colored drop shadows and accents.
+*   **Fluid Motion:** All interactions feature smooth spring-like animations.
+
 ## 🚀 Features
 
 ### 1. The Physics Pile
 *   Powered by **Matter.js**.
-*   100+ posts render simultaneously with collision detection.
-*   Posts "rain" down upon initialization or refresh.
-*   Drag and throw interaction enabled for desktop and touch.
+*   Renders dynamic bodies based on text length (Circles, Pills, Blobs).
+*   Real-time collision detection and stacking.
+*   Drag-and-drop interaction for desktop and touch devices.
 
 ### 2. Mood-First Creation Flow
 *   **Step 1:** Select a mood from a visual grid (Happy, Excited, Loving, Chill, Sad, Angry).
 *   **Step 2:** Type your thought (140 char limit).
-*   **Result:** The post drops physically into the world with a color matching its mood.
+*   **Result:** The post drops physically into the world, styled with a glass-like finish and mood-specific color.
 
 ### 3. Interactive Details
-*   Clicking a bubble opens a focused Detail Modal.
-*   **Upvote/Pass:** Binary voting system.
-*   **Report:** Moderation flagging.
-*   **Share:** Placeholder for social sharing.
+*   Clicking a bubble opens a focused **Glass Detail Modal**.
+*   **Upvote/Pass:** Binary voting system with bouncy micro-interactions.
+*   **Save/Bookmark:** Save posts to your personal library.
+*   **Report:** Moderation flagging system.
 
-### 4. Smart Content (Hybrid)
+### 4. Utilities
+*   **Search:** Filter the physics pile in real-time by text content.
+*   **User Profile:** Customize handle, bio, and location (stored in local state).
+*   **Settings:** Toggle sound, haptics, and dark mode preferences.
+*   **Localization:** Toggle between English and Khmer (Demo UI).
+
+### 5. Smart Content (Hybrid)
 *   **Static Fallback:** Includes 100+ pre-written witty/humorous posts for instant demo load.
-*   **AI Integrated:** Architecture includes `@google/genai` for dynamic sentiment analysis (currently bypassed for speed in the demo mode).
+*   **AI Integrated:** Architecture includes `@google/genai` for dynamic sentiment analysis.
 
 ## 🛠 Tech Stack
 
 *   **Frontend:** React 19 (TypeScript)
-*   **Styling:** Tailwind CSS
+*   **Styling:** Tailwind CSS (extensive use of `backdrop-blur`, `bg-opacity`, and `gradients`)
 *   **Physics Engine:** Matter.js
 *   **Icons:** Lucide React
 *   **AI:** Google Gemini API (via `@google/genai`)
-*   **Font:** Google Sans & Outfit
+*   **Font:** 'Outfit' (Google Fonts)
 
 ## 📂 Project Structure
 
-*   **`App.tsx`**: Main entry point, handles global state (posts list) and UI orchestration.
-*   **`components/PhysicsWorld.tsx`**: The core canvas component. Bridges React state with the imperative Matter.js physics engine. Handles the synchronization of DOM elements to physics bodies.
-*   **`components/CreatePostModal.tsx`**: The 2-step wizard for dropping new thoughts.
-*   **`components/PostDetailModal.tsx`**: The view for interacting with a specific post.
-*   **`services/geminiService.ts`**: Handles AI requests and provides the static data fallback for the initial "100 post" load.
-*   **`constants.ts`**: Configuration for physics attributes (friction, restitution) and Sentiment-to-Color mappings.
+*   **`App.tsx`**: Main entry point, handles global state, search logic, and modal orchestration.
+*   **`components/PhysicsWorld.tsx`**: The core canvas component. Bridges React state with the imperative Matter.js physics engine. Syncs DOM elements to physics bodies for the "Glass Pill" effect.
+*   **`components/PostDetailModal.tsx`**: The primary view for consuming content, featuring mood-colored glowing shadows.
+*   **`components/CreatePostModal.tsx`**: The 2-step creation wizard.
+*   **`services/geminiService.ts`**: Handles AI requests and provides the static data fallback.
+*   **`constants.ts`**: Configuration for physics attributes and Sentiment-to-Color mappings.
 
-## 🎨 Design System
+## 🌈 Sentiment Palette
 
-*   **Palette:**
-    *   Happy: Amber 300
-    *   Exciting: Red 400
-    *   Neutral: Blue 400
-    *   Sad: Gray 400
-    *   Angry: Red 500
-    *   Loving: Pink 400
-*   **Typography:** 'Outfit' and 'Google Sans' for a clean, modern, and friendly aesthetic.
-*   **Shapes:** Heavily rounded corners (pills/circles) to emphasize softness and playfulness.
+*   **Happy:** Amber 300 (`#FCD34D`)
+*   **Exciting:** Lime 300 (`#bef264`)
+*   **Neutral:** Blue 400 (`#60A5FA`)
+*   **Sad:** Gray 400 (`#9CA3AF`)
+*   **Angry:** Red 500 (`#EF4444`)
+*   **Loving:** Pink 400 (`#F472B6`)
 
 ---
 
