@@ -62,11 +62,19 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     const { width, height, radius } = getPostSize(post.text);
 
     // Randomize X, ensuring it stays within bounds
-    const x = Math.random() * (containerWidth - width) + width / 2;
+    // Clamp x so it doesn't spawn partially inside walls
+    const safeXMin = width / 2 + 10;
+    const safeXMax = containerWidth - width / 2 - 10;
+    const x = Math.max(safeXMin, Math.min(safeXMax, Math.random() * containerWidth));
     
-    // Spawn just above the viewport
-    // Increased range (-2500) to allow 100 items to fall in a stream rather than a clump
-    const y = -Math.random() * 2500 - 200; 
+    // Spawn Y Position Logic:
+    // Check if post is "fresh" (created in last 2 seconds)
+    // This allows fresh posts to drop from just above screen, while bulk loads scatter high up.
+    const isFresh = (Date.now() - post.createdAt) < 2000;
+
+    const y = isFresh 
+        ? -height - 100 // Just above the viewport
+        : -Math.random() * 2500 - 200; // Scattered high up for initial load
     
     const body = Matter.Bodies.rectangle(x, y, width, height, {
       chamfer: { radius: radius }, 
@@ -76,6 +84,11 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       label: post.id,
       angle: (Math.random() - 0.5) * 0.5 // Random slight rotation
     });
+
+    // Give fresh posts a downward velocity nudge so they don't get stuck sleeping
+    if (isFresh) {
+       Matter.Body.setVelocity(body, { x: 0, y: 10 });
+    }
 
     Matter.World.add(world, body);
     bodiesMapRef.current.set(post.id, body);
@@ -94,17 +107,18 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     engineRef.current = engine;
 
     // World bounds (Floor, Walls)
+    // Floor is slightly below viewport to ensure they stack visibly on bottom edge
     const floor = Matter.Bodies.rectangle(width / 2, height + PHYSICS_CONFIG.WALL_THICKNESS / 2, width, PHYSICS_CONFIG.WALL_THICKNESS, { 
       isStatic: true,
       render: { visible: false }
     });
     
-    // Walls
-    const leftWall = Matter.Bodies.rectangle(0 - PHYSICS_CONFIG.WALL_THICKNESS / 2, height / 2, PHYSICS_CONFIG.WALL_THICKNESS, height * 5, { 
+    // Walls - Extended height to guide falling posts
+    const leftWall = Matter.Bodies.rectangle(0 - PHYSICS_CONFIG.WALL_THICKNESS / 2, height / 2 - 1000, PHYSICS_CONFIG.WALL_THICKNESS, height * 5, { 
       isStatic: true,
       render: { visible: false } 
     });
-    const rightWall = Matter.Bodies.rectangle(width + PHYSICS_CONFIG.WALL_THICKNESS / 2, height / 2, PHYSICS_CONFIG.WALL_THICKNESS, height * 5, { 
+    const rightWall = Matter.Bodies.rectangle(width + PHYSICS_CONFIG.WALL_THICKNESS / 2, height / 2 - 1000, PHYSICS_CONFIG.WALL_THICKNESS, height * 5, { 
       isStatic: true, 
       render: { visible: false }
     });
@@ -148,31 +162,39 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     // Render loop for syncing DOM
     let animationFrameId: number;
     const updateLoop = () => {
-      posts.forEach(post => {
-        const body = bodiesMapRef.current.get(post.id);
-        const el = document.getElementById(`post-${post.id}`);
+      // Iterate over all active physics bodies
+      bodiesMapRef.current.forEach((body, id) => {
+        const el = document.getElementById(`post-${id}`);
+        // Only update if the DOM element exists
         if (body && el) {
           const { x, y } = body.position;
           let angle = body.angle;
           
-          // Get dynamic dimensions to calculate center offset
-          const { width, height: postHeight } = getPostSize(post.text);
+          // Safety check for bounds
+          if (body.bounds) {
+             const bWidth = body.bounds.max.x - body.bounds.min.x; 
+             const bHeight = body.bounds.max.y - body.bounds.min.y;
 
-          // Prevent text from being upside down for readability
-          if (Math.cos(angle) < 0) {
-            angle += Math.PI;
-          }
-
-          // Apply transform to DOM element (centering based on dynamic width/height)
-          el.style.transform = `translate(${x - width / 2}px, ${y - postHeight / 2}px) rotate(${angle}rad)`;
-          
-          // Reset if fallen too far out of bounds (glitch safety)
-          if (y > height + 200) {
-            Matter.Body.setPosition(body, { 
-              x: Math.random() * (width - 100) + 50, 
-              y: -200 
-            });
-            Matter.Body.setVelocity(body, { x: 0, y: 0 });
+             // Prevent text from being upside down for readability
+             if (Math.cos(angle) < 0) {
+               angle += Math.PI;
+             }
+   
+             // Apply transform
+             el.style.transform = `translate(${x - bWidth / 2}px, ${y - bHeight / 2}px) rotate(${angle}rad)`;
+             // Important: Reveal the element now that it's positioned
+             el.style.opacity = '1'; 
+             
+             // Glitch safety: Reset if fallen too far out of bounds
+             // FIX: Use 'height' (container height) instead of 'engine.world.bounds.max.y'
+             // 'engine.world.bounds' is often undefined in Matter.js causing the error
+             if (y > height + 200) {
+               Matter.Body.setPosition(body, { 
+                 x: Math.random() * (bWidth - 100) + 50, 
+                 y: -200 
+               });
+               Matter.Body.setVelocity(body, { x: 0, y: 0 });
+             }
           }
         }
       });
@@ -241,13 +263,14 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
                 e.clientX - clickStartRef.current.x,
                 e.clientY - clickStartRef.current.y
               );
-              // If moved less than 10px, treat as click
               if (dist < 10) {
                 onPostClick(post);
               }
               clickStartRef.current = null;
             }}
-            className={`absolute top-0 left-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
+            // Added opacity-0 here. It will be set to opacity-1 by the physics loop once positioned.
+            // This prevents the "stuck at top left" flash before physics kicks in.
+            className={`absolute top-0 left-0 opacity-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
             style={{ width, height }}
           >
             {/* Inner Visual Container - Glassmorphism & Gradient Effects */}
@@ -257,9 +280,6 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
                 ${isDragged ? 'scale-110 brightness-105' : 'hover:scale-105 active:scale-95'}
               `}
               style={{
-                // Enhanced Gradient Background: 
-                // 1. White specular highlight (Top-Left)
-                // 2. Base Color
                 background: `
                   linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.05) 100%),
                   ${post.color}
@@ -269,9 +289,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
                 fontWeight: 600,
                 fontSize: fontSize,
                 lineHeight: '1.2',
-                // Glass-like Border
                 border: '1px solid rgba(255,255,255,0.5)',
-                // Soft shadow + Inset shine for volume
                 boxShadow: isDragged 
                   ? '0 25px 30px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255,255,255,0.5)' 
                   : '0 4px 8px -2px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.6)'
