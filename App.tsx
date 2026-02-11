@@ -7,6 +7,7 @@ import ProfileModal from './components/ProfileModal';
 import SettingsModal from './components/SettingsModal';
 import LogoutModal from './components/LogoutModal';
 import UserPostsModal from './components/UserPostsModal';
+import AboutModal from './components/AboutModal';
 
 import { Post, SentimentType } from './types';
 import { generateInitialPosts } from './services/geminiService';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -165,7 +167,11 @@ const App: React.FC = () => {
       
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-20 p-4 pointer-events-none flex justify-between items-start">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-3 pr-6 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-3">
+        <button 
+          onClick={() => setIsAboutModalOpen(true)}
+          className="bg-white/80 backdrop-blur-md rounded-2xl p-3 pr-6 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-3 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left"
+          title="About Project"
+        >
            {/* Custom Logo */}
            <div className="relative w-10 h-10 flex-shrink-0">
              <svg viewBox="0 0 48 48" fill="none" className="w-full h-full drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
@@ -187,7 +193,7 @@ const App: React.FC = () => {
              </h1>
              <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">The Social Pile</p>
            </div>
-        </div>
+        </button>
         
         <div className="flex gap-2 pointer-events-auto items-center">
              <button 
@@ -376,6 +382,11 @@ const App: React.FC = () => {
         isOpen={activeMenuModal === 'logout'} 
         onClose={() => setActiveMenuModal(null)} 
         onConfirm={handleLogout} 
+      />
+
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
       />
 
     </div>
