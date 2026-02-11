@@ -12,7 +12,7 @@ import AboutModal from './components/AboutModal';
 import CookingPotLoader from './components/CookingPotLoader';
 
 import { Post, SentimentType } from './types';
-import { generateInitialPosts } from './services/geminiService';
+import { generateInitialPosts } from './services/postService';
 import { SENTIMENT_COLORS } from './constants';
 
 // Simple ID helper

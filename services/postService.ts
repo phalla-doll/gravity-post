@@ -1,6 +1,16 @@
 import { SentimentType } from "../types";
 import { SENTIMENT_COLORS } from "../constants";
 
+// Mock sentiment analysis (formerly utilizing AI)
+export const analyzeSentiment = async (text: string): Promise<{ sentiment: SentimentType; color: string; isSafe: boolean }> => {
+  // Return neutral by default for safety in this demo version
+  return {
+    sentiment: SentimentType.NEUTRAL,
+    color: SENTIMENT_COLORS[SentimentType.NEUTRAL],
+    isSafe: true
+  };
+};
+
 const STATIC_POSTS = [
   { text: "My bed is a magical place where I suddenly remember everything I forgot to do.", sentiment: SentimentType.NEUTRAL },
   { text: "I put the 'pro' in procrastination.", sentiment: SentimentType.HAPPY },
@@ -116,11 +126,17 @@ const STATIC_POSTS = [
   { text: "ញញឹមដាក់បញ្ហា បញ្ហានឹងឆ្ងល់ថាឆ្កួតឬអត់។", sentiment: SentimentType.HAPPY }
 ];
 
-export const generateInitialPosts = async (): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
-  // Simulate network delay for a more realistic feel
-  await new Promise(resolve => setTimeout(resolve, 2000));
+export const generateInitialPosts = async (count: number = 20): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
+  // Simulate network delay for a more realistic feel (reduced for pagination)
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-  return STATIC_POSTS.map(post => ({
+  // Create a larger pool by duplicating static posts to ensure we can fulfill high counts (like 100)
+  // independent of the source list size.
+  const pool = [...STATIC_POSTS, ...STATIC_POSTS, ...STATIC_POSTS];
+  const shuffled = pool.sort(() => 0.5 - Math.random());
+  
+  // Return the requested subset
+  return shuffled.slice(0, count).map(post => ({
     text: post.text,
     sentiment: post.sentiment as SentimentType,
     color: SENTIMENT_COLORS[post.sentiment as SentimentType] || SENTIMENT_COLORS[SentimentType.NEUTRAL]
