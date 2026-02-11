@@ -45,9 +45,21 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
           // Slight delay to allow animation to settle before focusing
           setTimeout(() => {
               inputRef.current?.focus();
-          }, 400);
+          }, 500); // Increased slightly to match new animation timing
       }
   }, [step, isOpen]);
+
+  // Handle Escape key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (isOpen && e.key === 'Escape') {
+            setIsOpen(false);
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   const handleMoodSelect = (mood: SentimentType) => {
     setSelectedMood(mood);
@@ -70,15 +82,37 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
   };
 
   // Dynamic Island Styles
-  // Fix: Added max-w-md to collapsed state to prevent width jump during transition
   const islandClasses = isOpen 
     ? "w-[90vw] max-w-md h-[420px] rounded-[32px] bg-white/95 border-white/80" 
     : "w-[170px] max-w-md h-[52px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
 
-  // When open, we might want to color the background based on mood
-  const backgroundStyle = isOpen && selectedMood 
-    ? { background: `linear-gradient(to bottom right, #ffffff, ${SENTIMENT_COLORS[selectedMood]}30)` }
-    : {};
+  // Advanced Transition Styles for "Width then Height" effect
+  // Refined for smoothness and performance
+  const transitionStyle: React.CSSProperties = {
+      transitionProperty: 'width, height, border-radius, background-color, transform, opacity',
+      // Use Quaternary ease-out for a very smooth, high-quality motion feel
+      transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)', 
+      willChange: 'width, height, transform', // Hardware acceleration hint
+      
+      ...(isOpen && selectedMood 
+          ? { background: `linear-gradient(to bottom right, #ffffff, ${SENTIMENT_COLORS[selectedMood]}30)` } 
+          : {}
+      )
+  };
+
+  // Explicit timings to decouple width and height animations slightly
+  // Open: Width expands fast (0.4s), Height expands slightly slower (0.5s) with a small delay
+  // Close: Height collapses fast (0.4s), Width collapses slightly slower (0.5s) with a small delay
+  const customTransition = {
+      ...transitionStyle,
+      transitionDuration: isOpen 
+          ? '0.4s, 0.5s, 0.4s, 0.3s, 0.3s, 0.3s' 
+          : '0.5s, 0.4s, 0.4s, 0.3s, 0.3s, 0.3s',
+      
+      transitionDelay: isOpen 
+          ? '0s, 0.1s, 0s, 0s, 0s, 0s'    // OPEN: Width runs, then Height runs overlap
+          : '0.1s, 0s, 0s, 0s, 0s, 0s'    // CLOSE: Height runs, then Width runs overlap
+  };
 
   return (
     <>
@@ -93,15 +127,14 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
             <div 
                 className={`
                     relative overflow-hidden shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] border backdrop-blur-2xl
-                    transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
                     ${islandClasses}
                 `}
-                style={backgroundStyle}
+                style={customTransition}
                 onClick={() => !isOpen && setIsOpen(true)}
             >
                 {/* STATE 1: COLLAPSED BUTTON */}
                 <div 
-                    className={`absolute inset-0 flex items-center justify-center gap-3 transition-opacity duration-300 ${isOpen ? 'opacity-0 pointer-events-none delay-0' : 'opacity-100 delay-100'}`}
+                    className={`absolute inset-0 flex items-center justify-center gap-3 transition-opacity duration-300 ${isOpen ? 'opacity-0 pointer-events-none delay-0' : 'opacity-100 delay-200'}`}
                 >
                     <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg">
                         <Plus size={18} />
@@ -111,7 +144,7 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
 
                 {/* STATE 2: EXPANDED CONTENT */}
                 <div 
-                    className={`w-full h-full flex flex-col transition-opacity duration-500 ${isOpen ? 'opacity-100 delay-150' : 'opacity-0 pointer-events-none'}`}
+                    className={`w-full h-full flex flex-col transition-opacity duration-500 ${isOpen ? 'opacity-100 delay-300' : 'opacity-0 pointer-events-none'}`}
                 >
                     {/* Header inside Island */}
                     <div className="flex justify-between items-center p-5 pb-2 shrink-0">
