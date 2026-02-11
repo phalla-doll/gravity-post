@@ -113,7 +113,7 @@ const STATIC_POSTS = [
   { text: "Small steps every day.", sentiment: SentimentType.NEUTRAL },
   { text: "Make it happen.", sentiment: SentimentType.EXCITING },
   { text: "Love yourself first.", sentiment: SentimentType.LOVING },
-  // Khmer Posts
+  // Khmer Posts (Existing)
   { text: "ជីវិតគឺជាការតស៊ូ ប៉ុន្តែថ្ងៃនេះសុំខ្ជិលសិន។", sentiment: SentimentType.HAPPY },
   { text: "ឃ្លានរហូត មិនដឹងមកពីក្រពះ ឬមកពីអារម្មណ៍។", sentiment: SentimentType.NEUTRAL },
   { text: "កុំបោះបង់ក្តីស្រមៃ បន្តដេកទៀតទៅ។", sentiment: SentimentType.HAPPY },
@@ -123,20 +123,44 @@ const STATIC_POSTS = [
   { text: "សេដតិចៗ តែមិនអីទេ នៅតែស្អាត។", sentiment: SentimentType.SAD },
   { text: "ការងារច្រើនណាស់ ចង់តែទៅរស់នៅភពអង្គារ។", sentiment: SentimentType.ANGRY },
   { text: "ស្រលាញ់ខ្លួនឯង ឱ្យច្រើនជាងអ្នកដទៃ។", sentiment: SentimentType.LOVING },
-  { text: "ញញឹមដាក់បញ្ហា បញ្ហានឹងឆ្ងល់ថាឆ្កួតឬអត់។", sentiment: SentimentType.HAPPY }
+  { text: "ញញឹមដាក់បញ្ហា បញ្ហានឹងឆ្ងល់ថាឆ្កួតឬអត់។", sentiment: SentimentType.HAPPY },
+  // Khmer Posts (New Additions)
+  { text: "សុំទោសដែលស្អាតពេក ធ្វើឱ្យអ្នកពិបាកមើល។", sentiment: SentimentType.LOVING },
+  { text: "ចង់មានសង្សារ តែខ្លាចសង្សារសុំលុយចាយ។", sentiment: SentimentType.NEUTRAL },
+  { text: "ពេលរៀនងងុយដេក ពេលដេកទាញទូរស័ព្ទមកមើល។", sentiment: SentimentType.NEUTRAL },
+  { text: "អ៊ីនធឺណិតដើរយឺតជាងអណ្តើកវារទៀត។", sentiment: SentimentType.ANGRY },
+  { text: "គីឡូមិនសំខាន់ សំខាន់សាច់ស្អាត។", sentiment: SentimentType.HAPPY },
+  { text: "Single ក៏ល្អម្យ៉ាងដែរ មិនបាច់ចំណាយលុយទិញកាដូ។", sentiment: SentimentType.HAPPY },
+  { text: "សមត្ថភាពពិសេសរបស់ខ្ញុំគឺ ដេកបានគ្រប់កាលៈទេសៈ។", sentiment: SentimentType.EXCITING },
+  { text: "លុយបើកមកដូចទឹកភ្លៀង ចាយទៅវិញដូចទឹកបាក់ទំនប់។", sentiment: SentimentType.SAD },
+  { text: "មុខដូចតារា តែចរិតដូចមនុស្សឆ្កួត។", sentiment: SentimentType.EXCITING },
+  { text: "ស្នេហាគឺការព្យាយាម តែបើព្យាយាមពេកទៅជាមុខក្រាស់។", sentiment: SentimentType.NEUTRAL },
+  { text: "ញ៉ាំសិនទៅ ចាំគិតរឿងធាត់តាមក្រោយ។", sentiment: SentimentType.HAPPY },
+  { text: "ខំប្រឹងរៀនណាស់ តែចំណេះដឹងនៅដដែល។", sentiment: SentimentType.SAD },
+  { text: "ទូរស័ព្ទគឺជាសរីរាង្គទី ៣៣ របស់ខ្ញុំ។", sentiment: SentimentType.LOVING },
+  { text: "ភ្លេច Password ទៀតហើយ ជីវិតអើយជីវិត។", sentiment: SentimentType.ANGRY },
+  { text: "ជីវិតត្រូវការតែពីរយ៉ាងគឺ លុយ និង តែគុជ។", sentiment: SentimentType.HAPPY }
 ];
 
 export const generateInitialPosts = async (count: number = 20): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
   // Simulate network delay for a more realistic feel (reduced for pagination)
   await new Promise(resolve => setTimeout(resolve, 800));
 
-  // Create a larger pool by duplicating static posts to ensure we can fulfill high counts (like 100)
-  // independent of the source list size.
-  const pool = [...STATIC_POSTS, ...STATIC_POSTS, ...STATIC_POSTS];
-  const shuffled = pool.sort(() => 0.5 - Math.random());
+  // Use a unique pool to avoid duplicates
+  const uniquePool = [...STATIC_POSTS];
   
-  // Return the requested subset
-  return shuffled.slice(0, count).map(post => ({
+  // Fisher-Yates Shuffle
+  for (let i = uniquePool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [uniquePool[i], uniquePool[j]] = [uniquePool[j], uniquePool[i]];
+  }
+  
+  // If count is greater than available unique posts, we limit it to avoid duplicates.
+  // In a real app, this would fetch from a larger database with pagination.
+  const safeCount = Math.min(count, uniquePool.length);
+  
+  // Return the requested unique subset
+  return uniquePool.slice(0, safeCount).map(post => ({
     text: post.text,
     sentiment: post.sentiment as SentimentType,
     color: SENTIMENT_COLORS[post.sentiment as SentimentType] || SENTIMENT_COLORS[SentimentType.NEUTRAL]
