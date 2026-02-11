@@ -177,7 +177,7 @@ const STATIC_POSTS = [
 
 export const generateInitialPosts = async (): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
   // Simulate network delay for a more realistic feel
-  await new Promise(resolve => setTimeout(resolve, 800));
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   return STATIC_POSTS.map(post => ({
     text: post.text,

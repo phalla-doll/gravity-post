@@ -8,6 +8,7 @@ import SettingsModal from './components/SettingsModal';
 import LogoutModal from './components/LogoutModal';
 import UserPostsModal from './components/UserPostsModal';
 import AboutModal from './components/AboutModal';
+import CookingPotLoader from './components/CookingPotLoader';
 
 import { Post, SentimentType } from './types';
 import { generateInitialPosts } from './services/geminiService';
@@ -345,9 +346,8 @@ const App: React.FC = () => {
       {/* Physics Canvas */}
       <main className="flex-1 relative">
         {isLoading && posts.length === 0 ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-                <p>Building the pile...</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-50 animate-in fade-in duration-500">
+                <CookingPotLoader />
             </div>
         ) : filteredPosts.length === 0 && searchQuery ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 p-4 animate-in fade-in zoom-in duration-300">

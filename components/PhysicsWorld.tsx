@@ -68,7 +68,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     
     const body = Matter.Bodies.rectangle(x, y, width, height, {
       chamfer: { radius: radius }, 
-      restitution: 0.4, // Slightly less bouncy for stacking
+      restitution: 0.3, // Slightly less bouncy for stacking
       friction: 0.6,    // More friction for stability
       density: 0.001,
       label: post.id,
