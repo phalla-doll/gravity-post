@@ -142,10 +142,10 @@ const App: React.FC = () => {
       <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none">
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="pointer-events-auto group relative flex items-center gap-3 px-8 py-4 bg-black text-white rounded-full shadow-2xl hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all duration-300"
+          className="pointer-events-auto group relative flex items-center gap-3 px-6 py-3 bg-black text-white rounded-full shadow-2xl hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all duration-300"
         >
            <Plus className="group-hover:rotate-90 transition-transform duration-300" />
-           <span className="font-bold text-lg">Drop Thought</span>
+           <span className="font-semibold text-lg">Drop Thought</span>
         </button>
       </div>
 
