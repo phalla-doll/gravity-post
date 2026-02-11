@@ -83,17 +83,18 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearch
   };
 
   // Dynamic Island Styles
+  // Added max-w-md to the closed state to ensure constraints remain stable during transition
   const islandClasses = isOpen 
     ? "w-[90vw] max-w-md h-[420px] rounded-[32px] bg-white/95 border-white/80" 
-    : "md:w-[170px] md:h-[52px] w-[46px] h-[46px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
+    : "md:w-[170px] md:h-[52px] w-[46px] h-[46px] max-w-md rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
 
   // Advanced Transition Styles for "Width then Height" effect
   // Refined for smoothness and performance
   const transitionStyle: React.CSSProperties = {
-      transitionProperty: 'width, height, border-radius, background-color, transform, opacity, left, right, top',
+      transitionProperty: 'width, height, border-radius, background-color, transform, opacity',
       // Use Quaternary ease-out for a very smooth, high-quality motion feel
       transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)', 
-      willChange: 'width, height, transform, left, right', // Hardware acceleration hint
+      willChange: 'width, height, transform', // Hardware acceleration hint
       
       ...(isOpen && selectedMood 
           ? { background: `linear-gradient(to bottom right, #ffffff, ${SENTIMENT_COLORS[selectedMood]}30)` } 
@@ -107,16 +108,23 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearch
   const customTransition = {
       ...transitionStyle,
       transitionDuration: isOpen 
-          ? '0.4s, 0.5s, 0.4s, 0.3s, 0.3s, 0.3s, 0.5s, 0.5s, 0.5s' 
-          : '0.5s, 0.4s, 0.4s, 0.3s, 0.3s, 0.3s, 0.5s, 0.5s, 0.5s',
+          ? '0.4s, 0.5s, 0.4s, 0.3s, 0.3s, 0.3s' 
+          : '0.5s, 0.4s, 0.4s, 0.3s, 0.3s, 0.3s',
       
       transitionDelay: isOpen 
-          ? '0s, 0.1s, 0s, 0s, 0s, 0s, 0s, 0s, 0s'    // OPEN: Width runs, then Height runs overlap
-          : '0.1s, 0s, 0s, 0s, 0s, 0s, 0s, 0s, 0s'    // CLOSE: Height runs, then Width runs overlap
+          ? '0s, 0.1s, 0s, 0s, 0s, 0s'    // OPEN: Width runs, then Height runs overlap
+          : '0.1s, 0s, 0s, 0s, 0s, 0s'    // CLOSE: Height runs, then Width runs overlap
   };
 
   // If search is open and this is not expanded, hide it
   const isHidden = isSearchOpen && !isOpen;
+  
+  // Calculate position classes to avoid layout snapping
+  // 201px = 178px (original right offset) + 23px (half width of 46px button)
+  // We use `left` consistently to allow CSS transitions to interpolate the position.
+  const positionClass = isOpen
+    ? "left-1/2"
+    : "left-[calc(100%-201px)] md:left-1/2";
 
   return (
     <>
@@ -128,11 +136,10 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearch
 
         {/* The Dynamic Container */}
         <div className={`
-            fixed top-4 z-50 flex flex-col items-center transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]
-            ${isOpen 
-                ? 'left-1/2 -translate-x-1/2' 
-                : `right-[178px] md:left-1/2 md:right-auto md:-translate-x-1/2 ${isHidden ? 'opacity-0 pointer-events-none translate-x-10' : 'opacity-100'}`
-            }
+            fixed top-4 z-50 flex flex-col items-center -translate-x-1/2
+            transition-[left,transform,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]
+            ${positionClass}
+            ${isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}
         `}>
             <div 
                 className={`
