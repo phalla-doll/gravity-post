@@ -70,9 +70,10 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
   };
 
   // Dynamic Island Styles
+  // Fix: Added max-w-md to collapsed state to prevent width jump during transition
   const islandClasses = isOpen 
     ? "w-[90vw] max-w-md h-[420px] rounded-[32px] bg-white/95 border-white/80" 
-    : "w-[170px] h-[52px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
+    : "w-[170px] max-w-md h-[52px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
 
   // When open, we might want to color the background based on mood
   const backgroundStyle = isOpen && selectedMood 
