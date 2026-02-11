@@ -13,11 +13,17 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
   const [hasVoted, setHasVoted] = useState(0); // -1, 0, 1
   const [hasReported, setHasReported] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [animatingBtn, setAnimatingBtn] = useState<number | null>(null);
 
   if (!post) return null;
 
   const handleVote = (delta: number) => {
     if (hasVoted === delta) return; // Already voted this way
+    
+    // Trigger animation
+    setAnimatingBtn(delta);
+    setTimeout(() => setAnimatingBtn(null), 300);
+
     onVote(post.id, delta);
     setHasVoted(delta);
   };
@@ -71,23 +77,45 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
               "{post.text}"
             </p>
 
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-8">
+              {/* Upvote Button */}
               <button 
                 onClick={() => handleVote(1)}
-                className={`flex flex-col items-center gap-1 transition ${hasVoted === 1 ? 'text-green-600 scale-110' : 'text-gray-400 hover:text-gray-600'}`}
+                className={`
+                  flex flex-col items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                  ${animatingBtn === 1 ? 'scale-125 text-green-500' : (hasVoted === 1 ? 'text-green-600 scale-110' : 'text-gray-400 hover:text-gray-600 hover:scale-105')}
+                `}
               >
-                <div className={`p-3 rounded-full ${hasVoted === 1 ? 'bg-green-100' : 'bg-gray-100'}`}>
-                  <ThumbsUp size={24} fill={hasVoted === 1 ? "currentColor" : "none"} />
+                <div className={`
+                  p-3 rounded-full transition-all duration-300
+                  ${animatingBtn === 1 ? 'bg-green-200 ring-4 ring-green-100 shadow-lg' : (hasVoted === 1 ? 'bg-green-100' : 'bg-gray-100')}
+                `}>
+                  <ThumbsUp 
+                    size={24} 
+                    className={`transition-transform duration-300 ${animatingBtn === 1 ? '-rotate-12' : ''}`}
+                    fill={hasVoted === 1 ? "currentColor" : "none"} 
+                  />
                 </div>
                 <span className="font-bold text-sm">{post.upvotes + (hasVoted === 1 ? 1 : 0)}</span>
               </button>
 
+              {/* Downvote Button */}
               <button 
                 onClick={() => handleVote(-1)}
-                className={`flex flex-col items-center gap-1 transition ${hasVoted === -1 ? 'text-red-600 scale-110' : 'text-gray-400 hover:text-gray-600'}`}
+                className={`
+                  flex flex-col items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                  ${animatingBtn === -1 ? 'scale-125 text-red-500' : (hasVoted === -1 ? 'text-red-600 scale-110' : 'text-gray-400 hover:text-gray-600 hover:scale-105')}
+                `}
               >
-                <div className={`p-3 rounded-full ${hasVoted === -1 ? 'bg-red-100' : 'bg-gray-100'}`}>
-                  <ThumbsDown size={24} fill={hasVoted === -1 ? "currentColor" : "none"} />
+                <div className={`
+                  p-3 rounded-full transition-all duration-300
+                  ${animatingBtn === -1 ? 'bg-red-200 ring-4 ring-red-100 shadow-lg' : (hasVoted === -1 ? 'bg-red-100' : 'bg-gray-100')}
+                `}>
+                  <ThumbsDown 
+                    size={24} 
+                    className={`transition-transform duration-300 ${animatingBtn === -1 ? 'rotate-12' : ''}`}
+                    fill={hasVoted === -1 ? "currentColor" : "none"} 
+                  />
                 </div>
                 <span className="font-bold text-sm">Pass</span>
               </button>
