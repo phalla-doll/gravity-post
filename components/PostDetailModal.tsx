@@ -34,6 +34,9 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, isSaved, onClos
     setHasReported(true);
   };
 
+  // Determine username to display
+  const username = post.isMine ? '@gravity_guest' : `@user_${post.id.slice(0, 7)}`;
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
@@ -66,12 +69,15 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, isSaved, onClos
               <span>{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}</span>
               <span>•</span>
               <span>{post.sentiment}</span>
-              <span>•</span>
-              <span className="font-mono text-gray-300">#{post.id.slice(-6)}</span>
             </div>
             
-            <p className="text-2xl font-bold text-gray-800 leading-tight mb-8">
+            <p className="text-2xl font-bold text-gray-800 leading-tight mb-2">
               "{post.text}"
+            </p>
+
+            {/* Username Display */}
+            <p className="text-sm font-medium text-gray-400 mb-8 tracking-wide">
+              {username}
             </p>
 
             <div className="flex items-center justify-center gap-8">
