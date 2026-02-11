@@ -158,7 +158,8 @@ const App: React.FC = () => {
       isMine: true
     };
 
-    setPosts(prev => [newPost, ...prev]);
+    // Append to end so it renders last (on top visually)
+    setPosts(prev => [...prev, newPost]);
   };
 
   const handleVote = useCallback((id: string, delta: number) => {

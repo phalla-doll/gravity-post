@@ -253,7 +253,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
             {/* Inner Visual Container - Glassmorphism & Gradient Effects */}
             <div 
               className={`
-                w-full h-full flex items-center justify-center px-3 py-1 text-center transition-all duration-300 ease-out
+                w-full h-full flex items-center justify-center px-3 py-1 text-center transition-all duration-300 ease-out animate-pop-in
                 ${isDragged ? 'scale-110 brightness-105' : 'hover:scale-105 active:scale-95'}
               `}
               style={{
