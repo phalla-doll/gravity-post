@@ -23,18 +23,18 @@ const UserPostsModal: React.FC<UserPostsModalProps> = ({ isOpen, onClose, posts,
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[80vh]"
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Tabs */}
-        <div className="bg-white border-b sticky top-0 z-10">
+        <div className="border-b border-white/40 sticky top-0 z-10 bg-white/30 backdrop-blur-md">
             <div className="flex justify-between items-center p-4 pb-2">
                 <h2 className="text-lg font-bold text-gray-800 pl-2">Library</h2>
-                <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition">
+                <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition text-gray-600">
                     <X size={20} />
                 </button>
             </div>
@@ -56,10 +56,10 @@ const UserPostsModal: React.FC<UserPostsModalProps> = ({ isOpen, onClose, posts,
         </div>
 
         {/* Content List */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 bg-transparent">
             {displayPosts.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 p-8 text-center">
-                    <div className="bg-gray-100 p-6 rounded-full mb-4">
+                    <div className="bg-white/40 p-6 rounded-full mb-4 backdrop-blur-sm border border-white/50">
                         {activeTab === 'mine' ? <Ghost size={32} /> : <Bookmark size={32} />}
                     </div>
                     <p className="font-medium">
@@ -79,7 +79,7 @@ const UserPostsModal: React.FC<UserPostsModalProps> = ({ isOpen, onClose, posts,
                                 // Optional: Close this modal if you want to jump straight to physics view detail
                                 // onClose(); 
                             }}
-                            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer flex gap-4 items-start"
+                            className="bg-white/60 p-4 rounded-2xl shadow-sm border border-white/50 hover:bg-white/80 hover:shadow-md transition-all cursor-pointer flex gap-4 items-start backdrop-blur-sm"
                         >
                             <div 
                                 className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"

@@ -11,16 +11,16 @@ const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 relative"
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button 
           onClick={onClose} 
-          className="absolute top-3 right-3 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition z-10 text-gray-500"
+          className="absolute top-3 right-3 p-2 bg-white/40 hover:bg-white/70 rounded-full transition z-10 text-gray-500 backdrop-blur-sm"
         >
           <X size={20} />
         </button>
@@ -43,7 +43,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             <h2 className="text-2xl font-black text-gray-900 mb-2">Gravity</h2>
             <p className="text-xs font-bold text-purple-600 tracking-widest uppercase mb-6">The Social Pile</p>
 
-            <div className="bg-purple-50 p-6 rounded-2xl mb-6 text-left border border-purple-100">
+            <div className="bg-purple-50/50 p-6 rounded-2xl mb-6 text-left border border-purple-100/50 backdrop-blur-sm">
                 <p className="text-gray-700 text-sm leading-relaxed mb-4">
                     This is an <strong>experimental hobby project</strong> designed to reimagine how we consume social feeds. 
                 </p>
@@ -65,7 +65,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             </div>
         </div>
         
-        <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
+        <div className="bg-white/30 p-4 text-center border-t border-white/40 backdrop-blur-sm">
              <p className="text-xs text-gray-400">
                  © {new Date().getFullYear()} Gravity Experiment.
              </p>

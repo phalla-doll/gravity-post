@@ -49,32 +49,33 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 border-4"
+        className="relative bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 border-4"
         style={{ borderColor: post.color }}
         onClick={(e) => e.stopPropagation()}
       >
         <button 
           onClick={onClose} 
-          className="absolute top-3 right-3 p-2 bg-white/50 hover:bg-white rounded-full transition z-10"
+          className="absolute top-3 right-3 p-2 bg-white/40 hover:bg-white/80 rounded-full transition z-10 backdrop-blur-sm"
         >
           <X size={20} />
         </button>
 
         <div 
-          className="h-32 w-full flex items-center justify-center p-6"
+          className="h-32 w-full flex items-center justify-center p-6 relative"
           style={{ backgroundColor: post.color }}
         >
+           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none" />
            {/* Decorative Mood Icon/Text could go here */}
-           <span className="text-6xl opacity-20 filter grayscale contrast-200">
+           <span className="text-6xl opacity-20 filter grayscale contrast-200 mix-blend-overlay">
              ❝
            </span>
         </div>
 
-        <div className="p-8 text-center -mt-6 bg-white rounded-t-3xl relative">
+        <div className="p-8 text-center -mt-6 bg-gradient-to-b from-white to-white/80 backdrop-blur-xl rounded-t-3xl relative">
             <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
               <span>{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}</span>
               <span>•</span>
@@ -86,7 +87,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
             </p>
 
             {/* Username Display */}
-            <p className="text-sm font-medium text-gray-400 mb-8 tracking-wide">
+            <p className="text-sm font-medium text-gray-500 mb-8 tracking-wide">
               {username}
             </p>
 
@@ -100,8 +101,8 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 `}
               >
                 <div className={`
-                  p-3 rounded-full transition-all duration-300
-                  ${animatingBtn === 1 ? 'bg-green-200 ring-4 ring-green-100 shadow-lg' : (hasVoted === 1 ? 'bg-green-100' : 'bg-gray-100')}
+                  p-3 rounded-full transition-all duration-300 backdrop-blur-sm
+                  ${animatingBtn === 1 ? 'bg-green-200 ring-4 ring-green-100 shadow-lg' : (hasVoted === 1 ? 'bg-green-100' : 'bg-gray-100/50 border border-gray-100')}
                 `}>
                   <ThumbsUp 
                     size={24} 
@@ -121,8 +122,8 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 `}
               >
                 <div className={`
-                  p-3 rounded-full transition-all duration-300
-                  ${animatingBtn === -1 ? 'bg-red-200 ring-4 ring-red-100 shadow-lg' : (hasVoted === -1 ? 'bg-red-100' : 'bg-gray-100')}
+                  p-3 rounded-full transition-all duration-300 backdrop-blur-sm
+                  ${animatingBtn === -1 ? 'bg-red-200 ring-4 ring-red-100 shadow-lg' : (hasVoted === -1 ? 'bg-red-100' : 'bg-gray-100/50 border border-gray-100')}
                 `}>
                   <ThumbsDown 
                     size={24} 
@@ -134,7 +135,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({
               </button>
             </div>
 
-            <div className="mt-8 pt-6 border-t flex justify-between items-center text-gray-400">
+            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center text-gray-400">
               <div className="flex gap-4">
                 <button className="flex items-center gap-2 hover:text-purple-600 transition text-sm">
                   <Share2 size={16} /> Share

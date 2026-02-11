@@ -16,16 +16,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]"
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b flex justify-between items-center">
+        <div className="p-4 border-b border-white/40 flex justify-between items-center bg-white/30">
           <h2 className="text-lg font-bold text-gray-800">Settings</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition">
+          <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition text-gray-600">
             <X size={20} />
           </button>
         </div>
@@ -37,12 +37,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
              
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><Volume2 size={18}/></div>
+                  <div className="p-2 bg-blue-100/50 text-blue-600 rounded-lg backdrop-blur-sm"><Volume2 size={18}/></div>
                   <span className="font-medium text-gray-700">Sound Effects</span>
                 </div>
                 <button 
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${soundEnabled ? 'bg-black' : 'bg-gray-200'}`}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${soundEnabled ? 'bg-black' : 'bg-gray-300/50 border border-gray-300'}`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${soundEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
@@ -50,12 +50,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 text-purple-600 rounded-lg"><Smartphone size={18}/></div>
+                  <div className="p-2 bg-purple-100/50 text-purple-600 rounded-lg backdrop-blur-sm"><Smartphone size={18}/></div>
                   <span className="font-medium text-gray-700">Haptics</span>
                 </div>
                 <button 
                   onClick={() => setHapticsEnabled(!hapticsEnabled)}
-                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${hapticsEnabled ? 'bg-black' : 'bg-gray-200'}`}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${hapticsEnabled ? 'bg-black' : 'bg-gray-300/50 border border-gray-300'}`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${hapticsEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
@@ -63,52 +63,52 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 text-gray-600 rounded-lg"><Moon size={18}/></div>
+                  <div className="p-2 bg-gray-100/50 text-gray-600 rounded-lg backdrop-blur-sm"><Moon size={18}/></div>
                   <span className="font-medium text-gray-700">Dark Mode</span>
                 </div>
                 <button 
                   onClick={() => setDarkMode(!darkMode)}
-                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${darkMode ? 'bg-black' : 'bg-gray-200'}`}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${darkMode ? 'bg-black' : 'bg-gray-300/50 border border-gray-300'}`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
              </div>
           </div>
 
-          <div className="h-px bg-gray-100 mx-4" />
+          <div className="h-px bg-white/50 mx-4" />
 
           {/* Notifications */}
           <div className="p-4 space-y-4">
              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Notifications</h3>
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 text-red-600 rounded-lg"><Bell size={18}/></div>
+                  <div className="p-2 bg-red-100/50 text-red-600 rounded-lg backdrop-blur-sm"><Bell size={18}/></div>
                   <span className="font-medium text-gray-700">Push Notifications</span>
                 </div>
                 <button 
                   onClick={() => setNotifications(!notifications)}
-                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${notifications ? 'bg-black' : 'bg-gray-200'}`}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out ${notifications ? 'bg-black' : 'bg-gray-300/50 border border-gray-300'}`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
              </div>
           </div>
 
-          <div className="h-px bg-gray-100 mx-4" />
+          <div className="h-px bg-white/50 mx-4" />
 
           {/* Support */}
           <div className="p-4 space-y-2">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Support</h3>
-            <button className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition text-left text-gray-700">
+            <button className="w-full flex items-center gap-3 p-2 hover:bg-white/50 rounded-lg transition text-left text-gray-700">
                <Shield size={18} className="text-gray-400" /> Privacy Policy
             </button>
-            <button className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition text-left text-gray-700">
+            <button className="w-full flex items-center gap-3 p-2 hover:bg-white/50 rounded-lg transition text-left text-gray-700">
                <HelpCircle size={18} className="text-gray-400" /> Help Center
             </button>
           </div>
         </div>
 
-        <div className="p-4 bg-gray-50 text-center text-xs text-gray-400">
+        <div className="p-4 bg-white/30 text-center text-xs text-gray-400 backdrop-blur-sm">
           Gravity v1.0.0 (Beta)
         </div>
       </div>

@@ -43,17 +43,17 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative h-32 bg-gradient-to-r from-purple-500 to-pink-500">
            <button 
             onClick={onClose} 
-            className="absolute top-3 right-3 p-2 bg-black/10 hover:bg-black/20 text-white rounded-full transition z-10"
+            className="absolute top-3 right-3 p-2 bg-black/10 hover:bg-black/20 text-white rounded-full transition z-10 backdrop-blur-sm"
           >
             <X size={20} />
           </button>
@@ -78,7 +78,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
                             type="text" 
                             value={editedProfile.name}
                             onChange={(e) => setEditedProfile({...editedProfile, name: e.target.value})}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 font-bold text-gray-800"
+                            className="w-full px-3 py-2 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 font-bold text-gray-800"
                             placeholder="Display Name"
                         />
                      </div>
@@ -88,7 +88,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
                             type="text" 
                             value={editedProfile.handle}
                             onChange={(e) => setEditedProfile({...editedProfile, handle: e.target.value})}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-purple-600 font-medium"
+                            className="w-full px-3 py-2 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-purple-600 font-medium"
                             placeholder="@handle"
                         />
                      </div>
@@ -100,7 +100,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
                                 type="text" 
                                 value={editedProfile.location}
                                 onChange={(e) => setEditedProfile({...editedProfile, location: e.target.value})}
-                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-sm font-medium text-gray-700"
+                                className="w-full pl-9 pr-3 py-2 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-sm font-medium text-gray-700"
                                 placeholder="City, Planet"
                             />
                          </div>
@@ -110,14 +110,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
                         <textarea 
                             value={editedProfile.bio}
                             onChange={(e) => setEditedProfile({...editedProfile, bio: e.target.value})}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-sm text-gray-700 resize-none h-20"
+                            className="w-full px-3 py-2 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 text-sm text-gray-700 resize-none h-20"
                             placeholder="Tell us about yourself..."
                             maxLength={100}
                         />
                      </div>
                      <button 
                         onClick={handleSave}
-                        className="w-full py-2 bg-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-purple-700 transition"
+                        className="w-full py-2 bg-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-purple-700 transition shadow-lg"
                      >
                         <Save size={18} /> Save Changes
                      </button>
@@ -128,7 +128,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
                         <h2 className="text-2xl font-black text-gray-800">{userProfile.name}</h2>
                         <button 
                             onClick={() => setIsEditing(true)}
-                            className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition"
+                            className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50/50 rounded-full transition"
                             title="Edit Profile"
                         >
                             <Edit2 size={16} />
@@ -153,18 +153,18 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userProfil
 
            {!isEditing && (
             <div className="grid grid-cols-2 gap-3 mt-6">
-                <div className="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                <div className="bg-white/40 p-4 rounded-2xl text-center border border-white/50 backdrop-blur-sm">
                 <div className="text-2xl font-black text-gray-900">12</div>
                 <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">Drops</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                <div className="bg-white/40 p-4 rounded-2xl text-center border border-white/50 backdrop-blur-sm">
                 <div className="text-2xl font-black text-gray-900">45</div>
                 <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">Upvotes</div>
                 </div>
             </div>
            )}
 
-           <div className="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+           <div className="mt-6 pt-6 border-t border-gray-200/50 flex items-center justify-between text-sm text-gray-500">
               <span className="flex items-center gap-2"><Activity size={16} className="text-green-500"/> Online</span>
               <span>Level 1 Observer</span>
            </div>

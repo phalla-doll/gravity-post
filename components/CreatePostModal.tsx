@@ -59,20 +59,20 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b flex justify-between items-center bg-gray-50 shrink-0">
+        <div className="p-4 border-b border-white/40 flex justify-between items-center bg-white/30 shrink-0">
           <div className="flex items-center gap-2">
             {step === 'text' && (
               <button 
                 onClick={handleBack}
-                className="p-1.5 hover:bg-gray-200 rounded-full transition mr-1"
+                className="p-1.5 hover:bg-white/50 rounded-full transition mr-1 text-gray-700"
               >
                 <ArrowLeft size={18} />
               </button>
@@ -81,7 +81,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
               {step === 'mood' ? 'Pick a Vibe' : 'Speak Your Mind'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition">
+          <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition text-gray-600">
             <X size={20} />
           </button>
         </div>
@@ -103,10 +103,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                     onClick={() => handleMoodSelect(option.type)}
                     onMouseEnter={() => setHoveredMood(option.type)}
                     onMouseLeave={() => setHoveredMood(null)}
-                    className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 ease-out"
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ease-out backdrop-blur-sm"
                     style={{
-                      backgroundColor: isHovered ? baseColor : 'white',
-                      borderColor: isHovered ? baseColor : '#f3f4f6',
+                      backgroundColor: isHovered ? baseColor : 'rgba(255, 255, 255, 0.4)',
+                      borderColor: isHovered ? baseColor : 'rgba(255, 255, 255, 0.6)',
                       transform: isHovered ? 'translateY(-2px)' : 'none',
                       boxShadow: isHovered ? `0 10px 25px -5px ${baseColor}80` : 'none'
                     }}
@@ -133,10 +133,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
             <form onSubmit={handleSubmit} className="space-y-4 animate-in slide-in-from-right duration-300">
               <div className="relative">
                 <div 
-                  className="absolute -top-3 left-4 px-2 text-xs font-bold uppercase tracking-wider rounded-full py-0.5 border"
+                  className="absolute -top-3 left-4 px-2 text-xs font-bold uppercase tracking-wider rounded-full py-0.5 border shadow-sm z-10"
                   style={{ 
                     backgroundColor: selectedMood ? SENTIMENT_COLORS[selectedMood] : '#eee',
-                    borderColor: 'rgba(0,0,0,0.1)'
+                    borderColor: 'rgba(255,255,255,0.5)'
                   }}
                 >
                    {MOOD_OPTIONS.find(m => m.type === selectedMood)?.emoji} {MOOD_OPTIONS.find(m => m.type === selectedMood)?.label}
@@ -145,11 +145,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Type something playful..."
-                  className="w-full h-40 p-4 pt-6 rounded-xl border-2 border-gray-100 focus:border-purple-400 focus:ring-0 resize-none bg-gray-50 text-lg transition-all"
+                  className="w-full h-40 p-4 pt-6 rounded-xl border border-white/60 focus:border-purple-400 focus:ring-0 resize-none bg-white/40 backdrop-blur-sm text-lg transition-all placeholder-gray-400"
                   maxLength={140}
                   autoFocus
                 />
-                <div className="text-right text-xs text-gray-400 mt-1">
+                <div className="text-right text-xs text-gray-500 mt-1 font-medium">
                   {text.length}/140
                 </div>
               </div>
@@ -157,7 +157,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
               <button
                 type="submit"
                 disabled={!text.trim() || isSubmitting}
-                className="w-full py-4 px-4 bg-black text-white rounded-xl font-bold hover:bg-gray-800 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="w-full py-4 px-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
               >
                 {isSubmitting ? <Loader2 className="animate-spin" /> : <Send size={18} />}
                 Drop into Pile
