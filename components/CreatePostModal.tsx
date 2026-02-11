@@ -94,6 +94,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                 const isHovered = hoveredMood === option.type;
                 const baseColor = SENTIMENT_COLORS[option.type];
                 
+                // For lighter colors (Happy, Exciting), use dark text on hover. For others, use white.
+                const isLightColor = option.type === SentimentType.HAPPY || option.type === SentimentType.EXCITING;
+
                 return (
                   <button
                     key={option.type}
@@ -118,7 +121,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                     </div>
                     <span 
                       className="font-bold transition-colors duration-300"
-                      style={{ color: isHovered ? (option.type === SentimentType.HAPPY ? '#374151' : 'white') : '#374151' }}
+                      style={{ color: isHovered ? (isLightColor ? '#374151' : 'white') : '#374151' }}
                     >
                       {option.label}
                     </span>

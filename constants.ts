@@ -2,7 +2,7 @@ import { SentimentType } from './types';
 
 export const SENTIMENT_COLORS: Record<SentimentType, string> = {
   [SentimentType.HAPPY]: '#FCD34D', // Amber 300
-  [SentimentType.EXCITING]: '#F87171', // Red 400
+  [SentimentType.EXCITING]: '#bef264', // Lime 300 (Light Neon)
   [SentimentType.NEUTRAL]: '#60A5FA', // Blue 400
   [SentimentType.SAD]: '#9CA3AF', // Gray 400
   [SentimentType.ANGRY]: '#EF4444', // Red 500
