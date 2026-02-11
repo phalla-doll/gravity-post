@@ -374,10 +374,12 @@ const App: React.FC = () => {
       <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none">
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="pointer-events-auto group relative flex items-center gap-3 px-6 py-3 bg-black text-white rounded-full shadow-2xl hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all duration-300"
+          className="pointer-events-auto group relative flex items-center gap-3 pr-8 pl-2 py-2 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-2xl border border-white/60 text-slate-800 rounded-full shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.25)] hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
         >
-           <Plus className="group-hover:rotate-90 transition-transform duration-300" />
-           <span className="font-semibold text-lg">Drop Thought</span>
+           <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg group-hover:bg-gradient-to-br group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-500">
+             <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]" />
+           </div>
+           <span className="font-bold text-lg tracking-tight text-slate-900">Drop Thought</span>
         </button>
       </div>
 
