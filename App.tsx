@@ -60,13 +60,39 @@ const App: React.FC = () => {
   // Language State
   const [language, setLanguage] = useState<'en' | 'km'>('en');
 
+  // Helper to calculate optimal post count based on screen area
+  const getDynamicPostCount = useCallback(() => {
+    if (typeof window === 'undefined') return 50;
+    
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const area = width * height;
+    
+    // Heuristic:
+    // Mobile (375x667 = ~250k) -> ~25 posts
+    // Laptop (1366x768 = ~1M) -> ~70 posts
+    // Desktop (1920x1080 = ~2M) -> ~120 posts
+    
+    // Pixels per post factor. Smaller number = more posts.
+    const PIXELS_PER_POST = 14000; 
+    
+    const calculated = Math.floor(area / PIXELS_PER_POST);
+    
+    // Clamping
+    const MIN_POSTS = 25;
+    const MAX_POSTS = 120; // Performance cap for Matter.js
+    
+    return Math.max(MIN_POSTS, Math.min(calculated, MAX_POSTS));
+  }, []);
+
   // Fetch posts when page changes
   useEffect(() => {
     const fetchPosts = async () => {
       setIsLoading(true);
       setPosts([]); // Clear to trigger re-fall/empty jar effect
       
-      const generated = await generateInitialPosts(100); // Fetch 100 random posts per page
+      const count = getDynamicPostCount();
+      const generated = await generateInitialPosts(count);
       
       const newPosts: Post[] = generated.map((g, index) => ({
         id: generateId(),
@@ -99,7 +125,7 @@ const App: React.FC = () => {
     };
 
     fetchPosts();
-  }, [page]);
+  }, [page, getDynamicPostCount]);
 
   // Focus effect for search
   useEffect(() => {
@@ -161,15 +187,15 @@ const App: React.FC = () => {
   }, []);
 
   const refreshPile = useCallback(() => {
-     // Re-trigger the effect by technically resetting page, or just force fetching.
-     // For simple UX, let's just empty and re-fetch current page logic
      setIsLoading(true);
      setPosts([]);
      setSearchQuery('');
      
      // Quick timeout to allow UI to show empty state before refetching
      setTimeout(async () => {
-         const generated = await generateInitialPosts(100);
+         const count = getDynamicPostCount();
+         const generated = await generateInitialPosts(count);
+         
          const newPosts: Post[] = generated.map((g, index) => ({
             id: generateId(),
             text: g.text,
@@ -197,7 +223,7 @@ const App: React.FC = () => {
          setPosts(newPosts);
          setIsLoading(false);
      }, 500);
-  }, [page]);
+  }, [page, getDynamicPostCount]);
 
   // Filter posts based on search query
   const filteredPosts = useMemo(() => {
