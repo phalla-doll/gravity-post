@@ -4,15 +4,16 @@ import { X, ThumbsUp, ThumbsDown, AlertTriangle, Share2, Bookmark } from 'lucide
 
 interface PostDetailModalProps {
   post: Post | null;
+  isSaved: boolean;
   onClose: () => void;
   onVote: (id: string, delta: number) => void;
   onReport: (id: string) => void;
+  onToggleSave: (id: string) => void;
 }
 
-const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote, onReport }) => {
+const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, isSaved, onClose, onVote, onReport, onToggleSave }) => {
   const [hasVoted, setHasVoted] = useState(0); // -1, 0, 1
   const [hasReported, setHasReported] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [animatingBtn, setAnimatingBtn] = useState<number | null>(null);
 
   if (!post) return null;
@@ -31,10 +32,6 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
   const handleReport = () => {
     onReport(post.id);
     setHasReported(true);
-  };
-
-  const handleSave = () => {
-    setIsSaved(!isSaved);
   };
 
   return (
@@ -127,7 +124,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onVote
                   <Share2 size={16} /> Share
                 </button>
                 <button 
-                  onClick={handleSave}
+                  onClick={() => onToggleSave(post.id)}
                   className={`flex items-center gap-2 transition text-sm ${isSaved ? 'text-blue-600 font-bold' : 'hover:text-blue-600'}`}
                 >
                   <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? 'Saved' : 'Save'}

@@ -3,6 +3,11 @@ import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Sear
 import PhysicsWorld from './components/PhysicsWorld';
 import CreatePostModal from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
+import ProfileModal from './components/ProfileModal';
+import SettingsModal from './components/SettingsModal';
+import LogoutModal from './components/LogoutModal';
+import UserPostsModal from './components/UserPostsModal';
+
 import { Post, SentimentType } from './types';
 import { generateInitialPosts } from './services/geminiService';
 import { INITIAL_POSTS_COUNT, SENTIMENT_COLORS } from './constants';
@@ -10,12 +15,20 @@ import { INITIAL_POSTS_COUNT, SENTIMENT_COLORS } from './constants';
 // Simple ID helper
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+type ActiveModal = 'profile' | 'posts' | 'settings' | 'logout' | null;
+
 const App: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Menu Modals State
+  const [activeMenuModal, setActiveMenuModal] = useState<ActiveModal>(null);
+
+  // Saved Posts State (Lifted)
+  const [savedPostIds, setSavedPostIds] = useState<Set<string>>(new Set());
   
   // Search State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -27,14 +40,16 @@ const App: React.FC = () => {
       setIsLoading(true);
       const generated = await generateInitialPosts();
       
-      const newPosts: Post[] = generated.map(g => ({
+      const newPosts: Post[] = generated.map((g, index) => ({
         id: generateId(),
         text: g.text,
         sentiment: g.sentiment,
         color: g.color,
         createdAt: Date.now(),
         upvotes: Math.floor(Math.random() * 50),
-        isFlagged: false
+        isFlagged: false,
+        // Mark first 5 posts as "mine" for demo purposes
+        isMine: index < 5 
       }));
 
       // Add a welcome post
@@ -45,7 +60,8 @@ const App: React.FC = () => {
         color: SENTIMENT_COLORS[SentimentType.HAPPY],
         createdAt: Date.now(),
         upvotes: 100,
-        isFlagged: false
+        isFlagged: false,
+        isMine: false
       });
 
       setPosts(newPosts);
@@ -55,9 +71,6 @@ const App: React.FC = () => {
   }, []);
 
   const handleCreatePost = async (text: string, sentiment: SentimentType) => {
-    // We trust the user's selected sentiment. 
-    // In a real app, we might still run a safety check here, but for responsiveness we skip it.
-    
     const newPost: Post = {
       id: generateId(),
       text,
@@ -65,7 +78,8 @@ const App: React.FC = () => {
       color: SENTIMENT_COLORS[sentiment],
       createdAt: Date.now(),
       upvotes: 0,
-      isFlagged: false
+      isFlagged: false,
+      isMine: true
     };
 
     setPosts(prev => [newPost, ...prev]);
@@ -78,11 +92,22 @@ const App: React.FC = () => {
   }, []);
 
   const handleReport = useCallback((id: string) => {
-    // In a real app, send to backend. Here we just flag it locally.
     setPosts(prev => prev.map(p => 
       p.id === id ? { ...p, isFlagged: true } : p
     ));
     alert("Thanks for keeping the pile clean. We've received your report.");
+  }, []);
+
+  const handleToggleSave = useCallback((id: string) => {
+    setSavedPostIds(prev => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+            next.delete(id);
+        } else {
+            next.add(id);
+        }
+        return next;
+    });
   }, []);
 
   const refreshPile = useCallback(async () => {
@@ -92,14 +117,15 @@ const App: React.FC = () => {
       setSearchQuery('');
       setTimeout(async () => {
           const generated = await generateInitialPosts();
-          const newPosts: Post[] = generated.map(g => ({
+          const newPosts: Post[] = generated.map((g, index) => ({
             id: generateId(),
             text: g.text,
             sentiment: g.sentiment,
             color: g.color,
             createdAt: Date.now(),
             upvotes: Math.floor(Math.random() * 50),
-            isFlagged: false
+            isFlagged: false,
+            isMine: index < 5
           }));
           setPosts(newPosts);
           setIsLoading(false);
@@ -119,13 +145,21 @@ const App: React.FC = () => {
     setSearchQuery('');
   };
 
+  const handleMenuClick = (modalType: ActiveModal) => {
+      setActiveMenuModal(modalType);
+      setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+      setActiveMenuModal(null);
+      alert("You have been logged out (Demo).");
+  };
+
   return (
     <div 
       className="h-screen w-screen flex flex-col relative overflow-hidden bg-slate-50 font-sans text-slate-900"
       onClick={() => {
         if (isMenuOpen) setIsMenuOpen(false);
-        // We don't necessarily want to close search on outside click if user is interacting with canvas, 
-        // but maybe we do. For now let's keep it open until explicit close for better UX while filtering.
       }}
     >
       
@@ -224,20 +258,35 @@ const App: React.FC = () => {
                       <p className="text-xs text-gray-500 truncate">user@gravity.app</p>
                     </div>
                     
-                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                    <button 
+                        onClick={() => handleMenuClick('profile')}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                    >
                       <User size={18} /> Profile
                     </button>
-                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                    <button 
+                        onClick={() => handleMenuClick('posts')}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                    >
                       <FileText size={18} /> My Posts
                     </button>
-                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                    <button 
+                        onClick={() => handleMenuClick('posts')} // Reusing posts modal with saved tab active logic could be better, but simpler to just open library
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                    >
                       <Bookmark size={18} /> Saved
                     </button>
-                    <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors">
+                    <button 
+                        onClick={() => handleMenuClick('settings')}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
+                    >
                       <Settings size={18} /> Settings
                     </button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <button className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                    <button 
+                        onClick={() => handleMenuClick('logout')}
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                    >
                       <LogOut size={18} /> Logout
                     </button>
                   </div>
@@ -285,7 +334,7 @@ const App: React.FC = () => {
         </button>
       </div>
 
-      {/* Modals */}
+      {/* Creation & Detail Modals */}
       <CreatePostModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
@@ -294,10 +343,41 @@ const App: React.FC = () => {
 
       <PostDetailModal 
         post={selectedPost} 
+        isSaved={selectedPost ? savedPostIds.has(selectedPost.id) : false}
         onClose={() => setSelectedPost(null)}
         onVote={handleVote}
         onReport={handleReport}
+        onToggleSave={handleToggleSave}
       />
+
+      {/* User Menu Modals */}
+      <ProfileModal 
+        isOpen={activeMenuModal === 'profile'} 
+        onClose={() => setActiveMenuModal(null)} 
+      />
+      
+      <UserPostsModal 
+        isOpen={activeMenuModal === 'posts'} 
+        onClose={() => setActiveMenuModal(null)} 
+        posts={posts}
+        savedPostIds={savedPostIds}
+        onPostClick={(post) => {
+            setActiveMenuModal(null); // Close list
+            setSelectedPost(post);    // Open detail
+        }}
+      />
+
+      <SettingsModal 
+        isOpen={activeMenuModal === 'settings'} 
+        onClose={() => setActiveMenuModal(null)} 
+      />
+
+      <LogoutModal 
+        isOpen={activeMenuModal === 'logout'} 
+        onClose={() => setActiveMenuModal(null)} 
+        onConfirm={handleLogout} 
+      />
+
     </div>
   );
 };

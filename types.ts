@@ -8,6 +8,7 @@ export interface Post {
   createdAt: number;
   upvotes: number;
   isFlagged: boolean;
+  isMine?: boolean; // New property to identify user's own posts
   position?: { x: number; y: number; angle: number }; // For physics syncing
 }
 
