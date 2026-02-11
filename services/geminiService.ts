@@ -1,63 +1,19 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { SentimentType } from "../types";
 import { SENTIMENT_COLORS } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-// Using a fast model for UI interactivity
-const MODEL_NAME = 'gemini-3-flash-preview';
+// NOTE: GoogleGenAI removed to allow running without API Key
+// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const analyzeSentiment = async (text: string): Promise<{ sentiment: SentimentType; color: string; isSafe: boolean }> => {
-  try {
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: `Analyze the sentiment of the following social media post text. 
-      Determine if it is HAPPY, SAD, ANGRY, EXCITING, NEUTRAL, or LOVING.
-      Also determine if the content is safe (not hate speech, explicit, or harassment).
-      
-      Text: "${text}"`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            sentiment: {
-              type: Type.STRING,
-              enum: [
-                SentimentType.HAPPY,
-                SentimentType.SAD,
-                SentimentType.ANGRY,
-                SentimentType.EXCITING,
-                SentimentType.NEUTRAL,
-                SentimentType.LOVING
-              ]
-            },
-            isSafe: {
-              type: Type.BOOLEAN
-            }
-          }
-        }
-      }
-    });
-
-    const result = JSON.parse(response.text || '{}');
-    const sentiment = result.sentiment || SentimentType.NEUTRAL;
-    
-    return {
-      sentiment: sentiment,
-      color: SENTIMENT_COLORS[sentiment as SentimentType] || SENTIMENT_COLORS[SentimentType.NEUTRAL],
-      isSafe: result.isSafe !== false // Default to true if undefined
-    };
-
-  } catch (error) {
-    console.error("Gemini analysis failed:", error);
-    // Fallback
-    return {
-      sentiment: SentimentType.NEUTRAL,
-      color: SENTIMENT_COLORS[SentimentType.NEUTRAL],
-      isSafe: true
-    };
-  }
+  // Fallback/Mock implementation since API is disabled
+  // In a real app without AI, this might use basic sentiment analysis libraries or simple keyword matching
+  
+  // Return neutral by default for safety
+  return {
+    sentiment: SentimentType.NEUTRAL,
+    color: SENTIMENT_COLORS[SentimentType.NEUTRAL],
+    isSafe: true
+  };
 };
 
 const STATIC_POSTS = [
