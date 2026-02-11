@@ -187,11 +187,11 @@ const App: React.FC = () => {
       <header className="absolute top-0 left-0 right-0 z-20 p-4 pointer-events-none flex justify-between items-start">
         <button 
           onClick={() => setIsAboutModalOpen(true)}
-          className="bg-white/80 backdrop-blur-md rounded-2xl p-3 pr-6 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-3 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left"
+          className="bg-white/80 backdrop-blur-md rounded-2xl p-2 pr-4 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-2.5 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left"
           title="About Project"
         >
            {/* Custom Logo */}
-           <div className="relative w-10 h-10 flex-shrink-0">
+           <div className="relative w-8 h-8 flex-shrink-0">
              <svg viewBox="0 0 48 48" fill="none" className="w-full h-full drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="logo-gradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
@@ -206,10 +206,10 @@ const App: React.FC = () => {
            </div>
 
            <div>
-             <h1 className="text-2xl font-black tracking-tight text-slate-800 leading-none">
+             <h1 className="text-xl font-black tracking-tight text-slate-800 leading-none">
                Gravity
              </h1>
-             <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">The Social Pile</p>
+             <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">The Social Pile</p>
            </div>
         </button>
         
