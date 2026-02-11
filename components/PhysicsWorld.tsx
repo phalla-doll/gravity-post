@@ -245,23 +245,34 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
             className={`absolute top-0 left-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
             style={{ width, height }}
           >
-            {/* Inner Visual Container - Handles color, shape, and hover effects */}
+            {/* Inner Visual Container - Glassmorphism & Gradient Effects */}
             <div 
               className={`
-                w-full h-full flex items-center justify-center px-2 py-0.5 text-center transition-all duration-300 ease-out border-2 border-black/5
-                ${isDragged ? 'shadow-2xl scale-110 ring-4 ring-white/60 brightness-105' : 'shadow-md hover:shadow-xl hover:scale-105 active:scale-95'}
+                w-full h-full flex items-center justify-center px-3 py-1 text-center transition-all duration-300 ease-out
+                ${isDragged ? 'scale-110 brightness-105' : 'hover:scale-105 active:scale-95'}
               `}
               style={{
-                backgroundColor: post.color, 
+                // Enhanced Gradient Background: 
+                // 1. White specular highlight (Top-Left)
+                // 2. Base Color
+                background: `
+                  linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.05) 100%),
+                  ${post.color}
+                `,
                 borderRadius: `${radius}px`,
                 color: '#1f2937', 
                 fontWeight: 600,
                 fontSize: fontSize,
                 lineHeight: '1.2',
-                boxShadow: isDragged ? '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)' : 'inset 0 -3px 0 rgba(0,0,0,0.1), 0 4px 10px rgba(0, 0, 0, 0.1)'
+                // Glass-like Border
+                border: '1px solid rgba(255,255,255,0.5)',
+                // Soft shadow + Inset shine for volume
+                boxShadow: isDragged 
+                  ? '0 25px 30px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255,255,255,0.5)' 
+                  : '0 4px 8px -2px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.6)'
               }}
             >
-              <span className="line-clamp-3 overflow-hidden text-ellipsis pointer-events-none">
+              <span className="line-clamp-3 overflow-hidden text-ellipsis pointer-events-none drop-shadow-sm">
                 {post.text}
               </span>
             </div>
