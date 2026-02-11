@@ -8,6 +8,16 @@ interface PhysicsWorldProps {
   onPostClick: (post: Post) => void;
 }
 
+// 5 Distinct sizes based on text length
+const getPostSize = (text: string) => {
+  const len = text.length;
+  if (len <= 15) return { width: 100, height: 100, radius: 50, fontSize: '0.9rem' };      // XS: Circle
+  if (len <= 40) return { width: 180, height: 90, radius: 45, fontSize: '0.95rem' };      // S: Small Pill
+  if (len <= 80) return { width: 240, height: 110, radius: 55, fontSize: '1rem' };        // M: Medium Pill
+  if (len <= 120) return { width: 300, height: 140, radius: 70, fontSize: '1.1rem' };     // L: Large Blob
+  return { width: 360, height: 160, radius: 80, fontSize: '1.2rem' };                     // XL: Huge Cloud
+};
+
 const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
@@ -22,19 +32,41 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   // State to force re-render of DOM elements when physics updates
   const [renderedPosts, setRenderedPosts] = useState<Post[]>([]);
 
+  // State to trigger re-initialization on resize
+  const [sceneKey, setSceneKey] = useState(0);
+
+  // Handle Resize with Debounce
+  useEffect(() => {
+    let timeoutId: any;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setSceneKey(prev => prev + 1);
+      }, 300); // Debounce to avoid performance thrashing
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   // Function to add a post to the physics world
   const addBodyForPost = useCallback((post: Post, world: Matter.World, containerWidth: number) => {
     if (bodiesMapRef.current.has(post.id)) return;
 
-    const x = Math.random() * (containerWidth - 100) + 50;
-    // Increase the vertical spawn range to -5000 to spread out 100 posts
-    const y = -Math.random() * 5000 - 100; 
+    const { width, height, radius } = getPostSize(post.text);
+
+    // Randomize X, ensuring it stays within bounds
+    const x = Math.random() * (containerWidth - width) + width / 2;
+    // Start way above the screen to rain down
+    const y = -Math.random() * 2000 - 200; 
     
-    // Create a chamfered rectangle for a "pill" shape
-    const body = Matter.Bodies.rectangle(x, y, 160, 60, {
-      chamfer: { radius: 25 }, // Rounded corners matching CSS borderRadius
-      restitution: 0.5, // Bounciness
-      friction: 0.5,
+    const body = Matter.Bodies.rectangle(x, y, width, height, {
+      chamfer: { radius: radius }, 
+      restitution: 0.4, // Slightly less bouncy for stacking
+      friction: 0.6,    // More friction for stability
       density: 0.001,
       label: post.id,
       angle: (Math.random() - 0.5) * 0.5 // Random slight rotation
@@ -76,7 +108,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
-        stiffness: 0.1, // Lower stiffness for smoother drag
+        stiffness: 0.1, 
         damping: 0.1,
         render: { visible: false }
       }
@@ -103,20 +135,23 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
         if (body && el) {
           const { x, y } = body.position;
           let angle = body.angle;
+          
+          // Get dynamic dimensions to calculate center offset
+          const { width, height: postHeight } = getPostSize(post.text);
 
           // Prevent text from being upside down for readability
           if (Math.cos(angle) < 0) {
             angle += Math.PI;
           }
 
-          // Apply transform to DOM element
-          el.style.transform = `translate(${x - 80}px, ${y - 30}px) rotate(${angle}rad)`;
+          // Apply transform to DOM element (centering based on dynamic width/height)
+          el.style.transform = `translate(${x - width / 2}px, ${y - postHeight / 2}px) rotate(${angle}rad)`;
           
           // Reset if fallen too far out of bounds (glitch safety)
           if (y > height + 200) {
             Matter.Body.setPosition(body, { 
               x: Math.random() * (width - 100) + 50, 
-              y: -100 
+              y: -200 
             });
             Matter.Body.setVelocity(body, { x: 0, y: 0 });
           }
@@ -131,9 +166,11 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       Matter.Runner.stop(runner);
       Matter.Engine.clear(engine);
       engineRef.current = null;
+      // Important: Clear bodies map so they are re-created in the next sync
+      bodiesMapRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
+  }, [sceneKey]); // Re-run on resize
 
   // Sync Posts with Physics World
   useEffect(() => {
@@ -157,17 +194,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       }
     });
 
-  }, [posts, addBodyForPost]);
-
-  // Handle Resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current || !engineRef.current) return;
-      // Ideally update wall positions here if dynamic resizing is needed
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [posts, addBodyForPost, sceneKey]); // Depend on sceneKey to re-populate after reset
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-slate-100 touch-none">
@@ -178,46 +205,51 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
          <div className="absolute -bottom-8 left-20 w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      {renderedPosts.map((post) => (
-        <div
-          key={post.id}
-          id={`post-${post.id}`}
-          onPointerDown={(e) => {
-            clickStartRef.current = { x: e.clientX, y: e.clientY };
-          }}
-          onClick={(e) => {
-            if (!clickStartRef.current) return;
-            const dist = Math.hypot(
-              e.clientX - clickStartRef.current.x,
-              e.clientY - clickStartRef.current.y
-            );
-            // If moved less than 10px, treat as click
-            if (dist < 10) {
-              onPostClick(post);
-            }
-            clickStartRef.current = null;
-          }}
-          className="absolute top-0 left-0 w-[160px] h-[60px] cursor-grab active:cursor-grabbing select-none will-change-transform z-10"
-        >
-          {/* Inner Visual Container - Handles color, shape, and hover effects */}
-          <div 
-            className="w-full h-full flex items-center justify-center p-3 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
-            style={{
-              backgroundColor: post.color, 
-              borderRadius: '25px', // Matches the physics body chamfer
-              color: '#1f2937', 
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              lineHeight: '1.1',
-              boxShadow: 'inset 0 -2px 0 rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      {renderedPosts.map((post) => {
+        const { width, height, radius, fontSize } = getPostSize(post.text);
+        
+        return (
+          <div
+            key={post.id}
+            id={`post-${post.id}`}
+            onPointerDown={(e) => {
+              clickStartRef.current = { x: e.clientX, y: e.clientY };
             }}
+            onClick={(e) => {
+              if (!clickStartRef.current) return;
+              const dist = Math.hypot(
+                e.clientX - clickStartRef.current.x,
+                e.clientY - clickStartRef.current.y
+              );
+              // If moved less than 10px, treat as click
+              if (dist < 10) {
+                onPostClick(post);
+              }
+              clickStartRef.current = null;
+            }}
+            className="absolute top-0 left-0 cursor-grab active:cursor-grabbing select-none will-change-transform z-10"
+            style={{ width, height }}
           >
-            <span className="line-clamp-2 overflow-hidden text-ellipsis px-1 pointer-events-none">
-              {post.text}
-            </span>
+            {/* Inner Visual Container - Handles color, shape, and hover effects */}
+            <div 
+              className="w-full h-full flex items-center justify-center px-3 py-1 text-center shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ease-out border-2 border-black/5"
+              style={{
+                backgroundColor: post.color, 
+                borderRadius: `${radius}px`,
+                color: '#1f2937', 
+                fontWeight: 600,
+                fontSize: fontSize,
+                lineHeight: '1.2',
+                boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.1), 0 4px 10px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <span className="line-clamp-3 overflow-hidden text-ellipsis pointer-events-none">
+                {post.text}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
