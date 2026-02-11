@@ -113,6 +113,34 @@ const STATIC_POSTS = [
   { text: "Small steps every day.", sentiment: SentimentType.NEUTRAL },
   { text: "Make it happen.", sentiment: SentimentType.EXCITING },
   { text: "Love yourself first.", sentiment: SentimentType.LOVING },
+  
+  // --- New English Additions (25) ---
+  { text: "Pizza is my soulmate.", sentiment: SentimentType.LOVING },
+  { text: "My favorite childhood memory is not paying bills.", sentiment: SentimentType.HAPPY },
+  { text: "I need a timeout. Send me to the beach.", sentiment: SentimentType.NEUTRAL },
+  { text: "Keep rolling your eyes, maybe you'll find a brain back there.", sentiment: SentimentType.ANGRY },
+  { text: "Life is better in pajamas.", sentiment: SentimentType.LOVING },
+  { text: "Brain: I’m sad. Me: Why? Brain: I don’t know, just embrace it.", sentiment: SentimentType.SAD },
+  { text: "I put the 'elusive' in exclusive relationship.", sentiment: SentimentType.NEUTRAL },
+  { text: "My bed is a time machine to breakfast.", sentiment: SentimentType.HAPPY },
+  { text: "Don't worry, I speak fluent sarcasm.", sentiment: SentimentType.EXCITING },
+  { text: "Adulting is like looking both ways before crossing the street and then getting hit by an airplane.", sentiment: SentimentType.SAD },
+  { text: "I wish common sense was more common.", sentiment: SentimentType.ANGRY },
+  { text: "You’re the avocado to my toast.", sentiment: SentimentType.LOVING },
+  { text: "Coffee and confidence.", sentiment: SentimentType.EXCITING },
+  { text: "Whatever sprinkles your donuts.", sentiment: SentimentType.HAPPY },
+  { text: "Can we uninstall 2024 and install it again? This version has a virus.", sentiment: SentimentType.ANGRY },
+  { text: "Currently holding it together with iced coffee.", sentiment: SentimentType.NEUTRAL },
+  { text: "If you can’t convince them, confuse them.", sentiment: SentimentType.EXCITING },
+  { text: "Love is blind, but marriage is an eye-opener.", sentiment: SentimentType.SAD },
+  { text: "I’m not lazy, I’m just highly motivated to do nothing.", sentiment: SentimentType.HAPPY },
+  { text: "Be the energy you want to attract.", sentiment: SentimentType.LOVING },
+  { text: "Mondays should be optional.", sentiment: SentimentType.ANGRY },
+  { text: "I'm fluent in silence.", sentiment: SentimentType.NEUTRAL },
+  { text: "Adventure awaits, go find it.", sentiment: SentimentType.EXCITING },
+  { text: "You make my heart smile.", sentiment: SentimentType.LOVING },
+  { text: "Tears are words the heart can't express.", sentiment: SentimentType.SAD },
+
   // Khmer Posts (Existing)
   { text: "ជីវិតគឺជាការតស៊ូ ប៉ុន្តែថ្ងៃនេះសុំខ្ជិលសិន។", sentiment: SentimentType.HAPPY },
   { text: "ឃ្លានរហូត មិនដឹងមកពីក្រពះ ឬមកពីអារម្មណ៍។", sentiment: SentimentType.NEUTRAL },
@@ -124,7 +152,6 @@ const STATIC_POSTS = [
   { text: "ការងារច្រើនណាស់ ចង់តែទៅរស់នៅភពអង្គារ។", sentiment: SentimentType.ANGRY },
   { text: "ស្រលាញ់ខ្លួនឯង ឱ្យច្រើនជាងអ្នកដទៃ។", sentiment: SentimentType.LOVING },
   { text: "ញញឹមដាក់បញ្ហា បញ្ហានឹងឆ្ងល់ថាឆ្កួតឬអត់។", sentiment: SentimentType.HAPPY },
-  // Khmer Posts (New Additions)
   { text: "សុំទោសដែលស្អាតពេក ធ្វើឱ្យអ្នកពិបាកមើល។", sentiment: SentimentType.LOVING },
   { text: "ចង់មានសង្សារ តែខ្លាចសង្សារសុំលុយចាយ។", sentiment: SentimentType.NEUTRAL },
   { text: "ពេលរៀនងងុយដេក ពេលដេកទាញទូរស័ព្ទមកមើល។", sentiment: SentimentType.NEUTRAL },
@@ -139,7 +166,34 @@ const STATIC_POSTS = [
   { text: "ខំប្រឹងរៀនណាស់ តែចំណេះដឹងនៅដដែល។", sentiment: SentimentType.SAD },
   { text: "ទូរស័ព្ទគឺជាសរីរាង្គទី ៣៣ របស់ខ្ញុំ។", sentiment: SentimentType.LOVING },
   { text: "ភ្លេច Password ទៀតហើយ ជីវិតអើយជីវិត។", sentiment: SentimentType.ANGRY },
-  { text: "ជីវិតត្រូវការតែពីរយ៉ាងគឺ លុយ និង តែគុជ។", sentiment: SentimentType.HAPPY }
+  { text: "ជីវិតត្រូវការតែពីរយ៉ាងគឺ លុយ និង តែគុជ។", sentiment: SentimentType.HAPPY },
+
+  // --- New Khmer Additions (25) ---
+  { text: "ពេលខ្លះជីវិតដូចរឿងកំប្លែង តែយើងមិនសើច។", sentiment: SentimentType.SAD },
+  { text: "ចង់ទៅដើរលេង តែលុយក្នុងកាបូបមិនយល់ព្រម។", sentiment: SentimentType.SAD },
+  { text: "កុំវិនិច្ឆ័យខ្ញុំតាមរូបរាង។", sentiment: SentimentType.ANGRY },
+  { text: "ស្នាមញញឹមគឺជាគ្រឿងសម្អាងដ៏ល្អបំផុត។", sentiment: SentimentType.HAPPY },
+  { text: "ស្រលាញ់គឺលះបង់ តែបើលះបង់ពេកអស់ខ្លួនហើយ។", sentiment: SentimentType.SAD },
+  { text: "ថ្ងៃនេះមេឃស្រឡះ តែចិត្តខ្ញុំមិនស្រឡះសោះ។", sentiment: SentimentType.SAD },
+  { text: "មនុស្សស្មោះនៅតែក្នុងរឿងនិទានទេដឹង?", sentiment: SentimentType.SAD },
+  { text: "ញ៉ាំអីក៏ឆ្ងាញ់ ឱ្យតែមានអ្នកចេញលុយ។", sentiment: SentimentType.HAPPY },
+  { text: "ការងារគឺជាជីវិត តែបើអត់ការងារគឺអត់លុយ។", sentiment: SentimentType.NEUTRAL },
+  { text: "រៀនមិនចេះ តែរឿងដើរលេងចាំច្បាស់។", sentiment: SentimentType.EXCITING },
+  { text: "អ្នកខ្លះល្អតែមាត់ តែចិត្តដូចយក្ស។", sentiment: SentimentType.ANGRY },
+  { text: "សុំចិត្តកុំរំខាន កំពុងរវល់... ដេក។", sentiment: SentimentType.NEUTRAL },
+  { text: "បើស្រលាញ់ កុំកុហក។", sentiment: SentimentType.LOVING },
+  { text: "ក្តីសុខគឺពេលបានញ៉ាំរបស់ឆ្ងាញ់។", sentiment: SentimentType.HAPPY },
+  { text: "កុំយកសម្តីអ្នកដទៃ មកដាក់ក្នុងចិត្តពេក។", sentiment: SentimentType.NEUTRAL },
+  { text: "ជីវិតខ្លីណាស់ ធ្វើអ្វីដែលអ្នកសប្បាយចិត្តទៅ។", sentiment: SentimentType.EXCITING },
+  { text: "ពេលឃ្លាន អារម្មណ៍មិនល្អទេ។", sentiment: SentimentType.ANGRY },
+  { text: "ខ្ញុំមិនមែនជាជម្រើស ខ្ញុំជាឱកាស។", sentiment: SentimentType.EXCITING },
+  { text: "ស្រលាញ់អ្នកណាក៏គេមិនស្រលាញ់វិញ។", sentiment: SentimentType.SAD },
+  { text: "មិត្តល្អគឺនៅពេលយើងដួល គេសើចហើយជួយលើក។", sentiment: SentimentType.HAPPY },
+  { text: "ថ្ងៃស្អែកនឹងល្អប្រសើរជាងថ្ងៃនេះ។", sentiment: SentimentType.EXCITING },
+  { text: "កុំខ្វល់ពីអ្នកដទៃ រស់នៅក្នុងរបៀបរបស់អ្នក។", sentiment: SentimentType.EXCITING },
+  { text: "ពិភពលោកនេះធំទូលាយណាស់ តែបន្ទប់ដេកខ្ញុំស្រួលជាង។", sentiment: SentimentType.HAPPY },
+  { text: "ចង់ក្លាយជាអ្នកមាន តែខ្ជិលរកស៊ី។", sentiment: SentimentType.NEUTRAL },
+  { text: "អ្នកគឺជាកម្លាំងចិត្តរបស់ខ្ញុំ។", sentiment: SentimentType.LOVING }
 ];
 
 export const generateInitialPosts = async (count: number = 20): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
