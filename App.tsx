@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X } from 'lucide-react';
+import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X, Ghost } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
 import CreatePostModal from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
@@ -252,6 +252,22 @@ const App: React.FC = () => {
             <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
                 <p>Building the pile...</p>
+            </div>
+        ) : filteredPosts.length === 0 && searchQuery ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 p-4 animate-in fade-in zoom-in duration-300">
+                <div className="bg-white p-6 rounded-full shadow-lg mb-2">
+                    <Ghost size={48} className="text-purple-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-700">Poof! Nothing here.</h3>
+                <p className="text-center max-w-xs text-sm text-slate-500">
+                    We couldn't find any thought bubbles matching "<span className="font-semibold text-purple-600">{searchQuery}</span>".
+                </p>
+                <button 
+                  onClick={handleCloseSearch}
+                  className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 transition shadow-md"
+                >
+                  Clear search
+                </button>
             </div>
         ) : (
             <PhysicsWorld posts={filteredPosts} onPostClick={setSelectedPost} />
