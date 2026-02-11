@@ -161,7 +161,18 @@ const STATIC_POSTS = [
   { text: "You got this.", sentiment: SentimentType.HAPPY },
   { text: "Small steps every day.", sentiment: SentimentType.NEUTRAL },
   { text: "Make it happen.", sentiment: SentimentType.EXCITING },
-  { text: "Love yourself first.", sentiment: SentimentType.LOVING }
+  { text: "Love yourself first.", sentiment: SentimentType.LOVING },
+  // Khmer Posts
+  { text: "ជីវិតគឺជាការតស៊ូ ប៉ុន្តែថ្ងៃនេះសុំខ្ជិលសិន។", sentiment: SentimentType.HAPPY },
+  { text: "ឃ្លានរហូត មិនដឹងមកពីក្រពះ ឬមកពីអារម្មណ៍។", sentiment: SentimentType.NEUTRAL },
+  { text: "កុំបោះបង់ក្តីស្រមៃ បន្តដេកទៀតទៅ។", sentiment: SentimentType.HAPPY },
+  { text: "លុយមិនអាចទិញសុភមង្គលបានទេ តែវាអាចទិញសាច់គោអាំងបាន។", sentiment: SentimentType.EXCITING },
+  { text: "ថ្ងៃនេះក្តៅខ្លាំង ស្មានតែនៅក្បែរព្រះអាទិត្យ។", sentiment: SentimentType.ANGRY },
+  { text: "មនុស្សល្អដូចខ្ញុំ គួរតែមានពីរនាក់លើលោក។", sentiment: SentimentType.LOVING },
+  { text: "សេដតិចៗ តែមិនអីទេ នៅតែស្អាត។", sentiment: SentimentType.SAD },
+  { text: "ការងារច្រើនណាស់ ចង់តែទៅរស់នៅភពអង្គារ។", sentiment: SentimentType.ANGRY },
+  { text: "ស្រលាញ់ខ្លួនឯង ឱ្យច្រើនជាងអ្នកដទៃ។", sentiment: SentimentType.LOVING },
+  { text: "ញញឹមដាក់បញ្ហា បញ្ហានឹងឆ្ងល់ថាឆ្កួតឬអត់។", sentiment: SentimentType.HAPPY }
 ];
 
 export const generateInitialPosts = async (): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
