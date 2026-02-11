@@ -18,6 +18,13 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 type ActiveModal = 'profile' | 'posts' | 'settings' | 'logout' | null;
 
+interface UserProfile {
+  name: string;
+  handle: string;
+  bio: string;
+  location: string;
+}
+
 const App: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -25,6 +32,14 @@ const App: React.FC = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // User Profile State
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: "Guest User",
+    handle: "@gravity_guest",
+    bio: "Just floating around in the gravity well. I like dropping thoughts and watching them collide.",
+    location: "Earth"
+  });
   
   // Menu Modals State
   const [activeMenuModal, setActiveMenuModal] = useState<ActiveModal>(null);
@@ -260,7 +275,7 @@ const App: React.FC = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="px-4 py-3 border-b border-gray-100 mb-1">
-                      <p className="text-sm font-bold text-gray-900">Guest User</p>
+                      <p className="text-sm font-bold text-gray-900">{userProfile.name}</p>
                       <p className="text-xs text-gray-500 truncate">user@gravity.app</p>
                     </div>
                     
@@ -354,12 +369,15 @@ const App: React.FC = () => {
         onVote={handleVote}
         onReport={handleReport}
         onToggleSave={handleToggleSave}
+        currentUserHandle={userProfile.handle}
       />
 
       {/* User Menu Modals */}
       <ProfileModal 
         isOpen={activeMenuModal === 'profile'} 
-        onClose={() => setActiveMenuModal(null)} 
+        onClose={() => setActiveMenuModal(null)}
+        userProfile={userProfile}
+        onUpdateProfile={setUserProfile}
       />
       
       <UserPostsModal 

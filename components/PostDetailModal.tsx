@@ -9,9 +9,18 @@ interface PostDetailModalProps {
   onVote: (id: string, delta: number) => void;
   onReport: (id: string) => void;
   onToggleSave: (id: string) => void;
+  currentUserHandle?: string; // New Prop
 }
 
-const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, isSaved, onClose, onVote, onReport, onToggleSave }) => {
+const PostDetailModal: React.FC<PostDetailModalProps> = ({ 
+    post, 
+    isSaved, 
+    onClose, 
+    onVote, 
+    onReport, 
+    onToggleSave,
+    currentUserHandle = '@gravity_guest' // Default fallback
+}) => {
   const [hasVoted, setHasVoted] = useState(0); // -1, 0, 1
   const [hasReported, setHasReported] = useState(false);
   const [animatingBtn, setAnimatingBtn] = useState<number | null>(null);
@@ -35,7 +44,8 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, isSaved, onClos
   };
 
   // Determine username to display
-  const username = post.isMine ? '@gravity_guest' : `@user_${post.id.slice(0, 7)}`;
+  // Use passed currentUserHandle if post is mine
+  const username = post.isMine ? currentUserHandle : `@user_${post.id.slice(0, 7)}`;
 
   return (
     <div 
