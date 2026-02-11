@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Plus, RefreshCw, Menu, User, FileText, Bookmark, Settings, LogOut, Search, X } from 'lucide-react';
 import PhysicsWorld from './components/PhysicsWorld';
 import CreatePostModal from './components/CreatePostModal';
 import PostDetailModal from './components/PostDetailModal';
@@ -16,6 +16,10 @@ const App: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Search State
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Initialize with Gemini data
   useEffect(() => {
@@ -84,6 +88,8 @@ const App: React.FC = () => {
   const refreshPile = useCallback(async () => {
       setPosts([]); // Clear to trigger re-fall
       setIsLoading(true);
+      // Reset search when refreshing
+      setSearchQuery('');
       setTimeout(async () => {
           const generated = await generateInitialPosts();
           const newPosts: Post[] = generated.map(g => ({
@@ -100,22 +106,56 @@ const App: React.FC = () => {
       }, 500);
   }, []);
 
+  // Filter posts based on search query
+  const filteredPosts = useMemo(() => {
+    if (!searchQuery.trim()) return posts;
+    return posts.filter(post => 
+      post.text.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [posts, searchQuery]);
+
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
+
   return (
     <div 
       className="h-screen w-screen flex flex-col relative overflow-hidden bg-slate-50 font-sans text-slate-900"
-      onClick={() => isMenuOpen && setIsMenuOpen(false)}
+      onClick={() => {
+        if (isMenuOpen) setIsMenuOpen(false);
+        // We don't necessarily want to close search on outside click if user is interacting with canvas, 
+        // but maybe we do. For now let's keep it open until explicit close for better UX while filtering.
+      }}
     >
       
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-20 p-4 pointer-events-none flex justify-between items-start">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/50 pointer-events-auto">
-           <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-             Gravity
-           </h1>
-           <p className="text-sm text-slate-500 font-medium">The social pile.</p>
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-3 pr-6 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-3">
+           {/* Custom Logo */}
+           <div className="relative w-10 h-10 flex-shrink-0">
+             <svg viewBox="0 0 48 48" fill="none" className="w-full h-full drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="logo-gradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#9333EA" />
+                    <stop offset="1" stopColor="#DB2777" />
+                  </linearGradient>
+                </defs>
+                <circle cx="16" cy="32" r="10" fill="url(#logo-gradient)" />
+                <circle cx="34" cy="28" r="9" fill="url(#logo-gradient)" fillOpacity="0.9" />
+                <circle cx="24" cy="14" r="9" fill="url(#logo-gradient)" />
+             </svg>
+           </div>
+
+           <div>
+             <h1 className="text-2xl font-black tracking-tight text-slate-800 leading-none">
+               Gravity
+             </h1>
+             <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">The Social Pile</p>
+           </div>
         </div>
         
-        <div className="flex gap-2 pointer-events-auto items-start">
+        <div className="flex gap-2 pointer-events-auto items-center">
              <button 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -126,12 +166,48 @@ const App: React.FC = () => {
              >
                 <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
              </button>
+
+             {/* Search Button / Expandable Input */}
+             <div className={`relative transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] ${isSearchOpen ? 'w-64' : 'w-auto'}`}>
+                {isSearchOpen ? (
+                    <div className="relative w-full h-full" onClick={(e) => e.stopPropagation()}>
+                        <input 
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search pile..."
+                            autoFocus
+                            className="w-full pl-10 pr-10 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-sm border border-purple-300 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-200 text-sm transition-all"
+                            style={{ height: '46px' }}
+                        />
+                        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-500" />
+                        <button 
+                            onClick={handleCloseSearch}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 transition"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                ) : (
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsSearchOpen(true);
+                            setIsMenuOpen(false); // Close menu if open
+                        }}
+                        className="p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white text-slate-600 transition flex items-center justify-center"
+                    >
+                        <Search size={20} />
+                    </button>
+                )}
+             </div>
              
              <div className="relative">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsMenuOpen(!isMenuOpen);
+                    setIsSearchOpen(false); // Close search if menu opens
                   }}
                   className={`p-3 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white transition flex items-center justify-center ${isMenuOpen ? 'bg-white text-purple-600 ring-2 ring-purple-100' : 'bg-white/80 text-slate-600'}`}
                 >
@@ -178,7 +254,7 @@ const App: React.FC = () => {
                 <p>Building the pile...</p>
             </div>
         ) : (
-            <PhysicsWorld posts={posts} onPostClick={setSelectedPost} />
+            <PhysicsWorld posts={filteredPosts} onPostClick={setSelectedPost} />
         )}
       </main>
 
