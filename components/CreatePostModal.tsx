@@ -6,6 +6,7 @@ import { SENTIMENT_COLORS } from '../constants';
 interface CreatePostModalProps {
   // We no longer need isOpen/onClose props as this component manages its own expansion state
   onSubmit: (text: string, sentiment: SentimentType) => Promise<void>;
+  isSearchOpen?: boolean; // New prop to hide button during search
 }
 
 const MOOD_OPTIONS = [
@@ -17,7 +18,7 @@ const MOOD_OPTIONS = [
   { type: SentimentType.ANGRY, label: 'Angry', emoji: '😡' },
 ];
 
-const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
+const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearchOpen = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'mood' | 'text'>('mood');
   const [selectedMood, setSelectedMood] = useState<SentimentType | null>(null);
@@ -84,15 +85,15 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
   // Dynamic Island Styles
   const islandClasses = isOpen 
     ? "w-[90vw] max-w-md h-[420px] rounded-[32px] bg-white/95 border-white/80" 
-    : "w-[170px] max-w-md h-[52px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
+    : "md:w-[170px] md:h-[52px] w-[46px] h-[46px] rounded-full bg-white/80 border-white/50 hover:scale-105 active:scale-95 cursor-pointer";
 
   // Advanced Transition Styles for "Width then Height" effect
   // Refined for smoothness and performance
   const transitionStyle: React.CSSProperties = {
-      transitionProperty: 'width, height, border-radius, background-color, transform, opacity',
+      transitionProperty: 'width, height, border-radius, background-color, transform, opacity, left, right, top',
       // Use Quaternary ease-out for a very smooth, high-quality motion feel
       transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)', 
-      willChange: 'width, height, transform', // Hardware acceleration hint
+      willChange: 'width, height, transform, left, right', // Hardware acceleration hint
       
       ...(isOpen && selectedMood 
           ? { background: `linear-gradient(to bottom right, #ffffff, ${SENTIMENT_COLORS[selectedMood]}30)` } 
@@ -106,13 +107,16 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
   const customTransition = {
       ...transitionStyle,
       transitionDuration: isOpen 
-          ? '0.4s, 0.5s, 0.4s, 0.3s, 0.3s, 0.3s' 
-          : '0.5s, 0.4s, 0.4s, 0.3s, 0.3s, 0.3s',
+          ? '0.4s, 0.5s, 0.4s, 0.3s, 0.3s, 0.3s, 0.5s, 0.5s, 0.5s' 
+          : '0.5s, 0.4s, 0.4s, 0.3s, 0.3s, 0.3s, 0.5s, 0.5s, 0.5s',
       
       transitionDelay: isOpen 
-          ? '0s, 0.1s, 0s, 0s, 0s, 0s'    // OPEN: Width runs, then Height runs overlap
-          : '0.1s, 0s, 0s, 0s, 0s, 0s'    // CLOSE: Height runs, then Width runs overlap
+          ? '0s, 0.1s, 0s, 0s, 0s, 0s, 0s, 0s, 0s'    // OPEN: Width runs, then Height runs overlap
+          : '0.1s, 0s, 0s, 0s, 0s, 0s, 0s, 0s, 0s'    // CLOSE: Height runs, then Width runs overlap
   };
+
+  // If search is open and this is not expanded, hide it
+  const isHidden = isSearchOpen && !isOpen;
 
   return (
     <>
@@ -123,7 +127,13 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
         />
 
         {/* The Dynamic Container */}
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center">
+        <div className={`
+            fixed top-4 z-50 flex flex-col items-center transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]
+            ${isOpen 
+                ? 'left-1/2 -translate-x-1/2' 
+                : `right-[178px] md:left-1/2 md:right-auto md:-translate-x-1/2 ${isHidden ? 'opacity-0 pointer-events-none translate-x-10' : 'opacity-100'}`
+            }
+        `}>
             <div 
                 className={`
                     relative overflow-hidden shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] border backdrop-blur-2xl
@@ -134,12 +144,12 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit }) => {
             >
                 {/* STATE 1: COLLAPSED BUTTON */}
                 <div 
-                    className={`absolute inset-0 flex items-center justify-center gap-3 transition-opacity duration-300 ${isOpen ? 'opacity-0 pointer-events-none delay-0' : 'opacity-100 delay-200'}`}
+                    className={`absolute inset-0 flex items-center justify-center md:gap-3 transition-opacity duration-300 ${isOpen ? 'opacity-0 pointer-events-none delay-0' : 'opacity-100 delay-200'}`}
                 >
                     <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg">
                         <Plus size={18} />
                     </div>
-                    <span className="font-semibold text-slate-800 tracking-tight">Drop Thought</span>
+                    <span className="font-semibold text-slate-800 tracking-tight hidden md:block">Drop Thought</span>
                 </div>
 
                 {/* STATE 2: EXPANDED CONTENT */}

@@ -258,9 +258,13 @@ const App: React.FC = () => {
       
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-40 p-4 pointer-events-none flex justify-between items-start">
+        {/* Logo - Hides on mobile when search is open to prevent overlap */}
         <button 
           onClick={() => setIsAboutModalOpen(true)}
-          className="bg-white/80 backdrop-blur-md rounded-2xl p-2 pr-4 shadow-sm border border-white/50 pointer-events-auto flex items-center gap-2.5 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left"
+          className={`
+            bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 pointer-events-auto flex items-center gap-2.5 hover:bg-white hover:scale-105 active:scale-95 transition-all text-left duration-300
+            ${isSearchOpen ? 'w-0 opacity-0 px-0 overflow-hidden md:w-auto md:opacity-100 md:p-2 md:pr-4' : 'p-2 pr-4'}
+          `}
           title="About Project"
         >
            {/* Custom Logo */}
@@ -278,7 +282,7 @@ const App: React.FC = () => {
              </svg>
            </div>
 
-           <div>
+           <div className="whitespace-nowrap">
              <h1 className="text-xl font-black tracking-tight text-slate-800 leading-none">
                Gravity
              </h1>
@@ -287,12 +291,16 @@ const App: React.FC = () => {
         </button>
         
         <div className="flex gap-2 pointer-events-auto items-center">
+             {/* Refresh Button - Hides on mobile when search is open */}
              <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   refreshPile();
                 }}
-                className="p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white text-slate-600 transition"
+                className={`
+                    bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 hover:bg-white text-slate-600 transition-all duration-300
+                    ${isSearchOpen ? 'w-0 opacity-0 p-0 overflow-hidden md:w-auto md:opacity-100 md:p-3' : 'p-3'}
+                `}
                 title="Refresh Pile"
              >
                 <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
@@ -303,13 +311,12 @@ const App: React.FC = () => {
                 className={`
                     relative h-[46px] bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-white/50 
                     flex items-center overflow-hidden
-                    transition-all ease-[cubic-bezier(0.25,1,0.5,1)]
-                    ${isSearchOpen ? 'bg-white ring-2 ring-purple-100 border-purple-300' : 'hover:bg-white cursor-pointer'}
+                    transition-all ease-[cubic-bezier(0.25,1,0.5,1)] duration-500
+                    ${isSearchOpen 
+                        ? 'bg-white ring-2 ring-purple-100 border-purple-300 w-[220px] sm:w-[260px]' 
+                        : 'hover:bg-white cursor-pointer w-[46px]'
+                    }
                 `}
-                style={{
-                    width: isSearchOpen ? '260px' : '46px',
-                    transitionDuration: '0.5s'
-                }}
                 onClick={(e) => {
                     e.stopPropagation();
                     if (!isSearchOpen) {
@@ -509,7 +516,10 @@ const App: React.FC = () => {
 
       {/* Replaced fixed bottom button with the Dynamic Post Creator */}
       {/* This component self-renders as a button and expands into the modal */}
-      <DynamicPostCreator onSubmit={handleCreatePost} />
+      <DynamicPostCreator 
+        onSubmit={handleCreatePost} 
+        isSearchOpen={isSearchOpen} 
+      />
 
       {/* Creation & Detail Modals */}
       {/* CreatePostModal is removed as it's now integrated via DynamicPostCreator above */}
