@@ -67,19 +67,18 @@ const App: React.FC = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const area = width * height;
+    const isMobile = width < 640;
     
-    // Heuristic:
-    // Mobile (375x667 = ~250k) -> ~25 posts
-    // Laptop (1366x768 = ~1M) -> ~70 posts
-    // Desktop (1920x1080 = ~2M) -> ~120 posts
-    
-    // Pixels per post factor. Smaller number = more posts.
-    const PIXELS_PER_POST = 14000; 
+    // Heuristic adjusted for denser mobile layout
+    // Desktop: ~14000 pixels per post
+    // Mobile: ~7000 pixels per post (since they are scaled down significantly)
+    // This allows for a higher density of posts on smaller screens.
+    const PIXELS_PER_POST = isMobile ? 7000 : 14000; 
     
     const calculated = Math.floor(area / PIXELS_PER_POST);
     
     // Clamping
-    const MIN_POSTS = 25;
+    const MIN_POSTS = isMobile ? 30 : 25;
     const MAX_POSTS = 120; // Performance cap for Matter.js
     
     return Math.max(MIN_POSTS, Math.min(calculated, MAX_POSTS));

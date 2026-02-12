@@ -9,8 +9,20 @@ interface PhysicsWorldProps {
 }
 
 // 5 Distinct sizes based on text length - Scaled down for compacter look
-const getPostSize = (text: string) => {
+// Added logic for Mobile (Dense) vs Desktop modes
+const getPostSize = (text: string, isMobile: boolean) => {
   const len = text.length;
+  
+  if (isMobile) {
+    // Dense Mobile Sizes (approx 65-75% of desktop)
+    if (len <= 15) return { width: 60, height: 60, radius: 30, fontSize: '0.65rem' };      // XS
+    if (len <= 40) return { width: 100, height: 55, radius: 25, fontSize: '0.7rem' };      // S
+    if (len <= 80) return { width: 130, height: 65, radius: 32, fontSize: '0.75rem' };     // M
+    if (len <= 120) return { width: 160, height: 75, radius: 38, fontSize: '0.8rem' };     // L
+    return { width: 190, height: 90, radius: 45, fontSize: '0.85rem' };                    // XL
+  }
+
+  // Standard Desktop Sizes
   if (len <= 15) return { width: 80, height: 80, radius: 40, fontSize: '0.75rem' };      // XS: Circle
   if (len <= 40) return { width: 140, height: 70, radius: 35, fontSize: '0.8rem' };      // S: Small Pill
   if (len <= 80) return { width: 190, height: 90, radius: 45, fontSize: '0.85rem' };     // M: Medium Pill
@@ -23,8 +35,12 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   const engineRef = useRef<Matter.Engine | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   
-  // Ref to track click start position for distinguishing drag vs click
-  const clickStartRef = useRef<{ x: number; y: number } | null>(null);
+  // Track mobile state for sizing
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 640 : false);
+
+  // Ref to track click start position and time for distinguishing drag vs click
+  // Added time tracking for better mobile 'tap' detection
+  const clickStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   
   // We keep track of bodies to sync with DOM
   const bodiesMapRef = useRef<Map<string, Matter.Body>>(new Map());
@@ -44,6 +60,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
     const handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth < 640);
         setSceneKey(prev => prev + 1);
       }, 300); // Debounce to avoid performance thrashing
     };
@@ -59,7 +76,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   const addBodyForPost = useCallback((post: Post, world: Matter.World, containerWidth: number) => {
     if (bodiesMapRef.current.has(post.id)) return;
 
-    const { width, height, radius } = getPostSize(post.text);
+    const { width, height, radius } = getPostSize(post.text, isMobile);
 
     // Randomize X, ensuring it stays within bounds
     // Clamp x so it doesn't spawn partially inside walls
@@ -92,7 +109,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
     Matter.World.add(world, body);
     bodiesMapRef.current.set(post.id, body);
-  }, []);
+  }, [isMobile]); // Re-create logic if mobile state changes
 
   // Initialize Physics Engine
   useEffect(() => {
@@ -247,7 +264,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       </div>
 
       {renderedPosts.map((post) => {
-        const { width, height, radius, fontSize } = getPostSize(post.text);
+        const { width, height, radius, fontSize } = getPostSize(post.text, isMobile);
         const isDragged = draggedId === post.id;
         
         return (
@@ -255,15 +272,27 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
             key={post.id}
             id={`post-${post.id}`}
             onPointerDown={(e) => {
-              clickStartRef.current = { x: e.clientX, y: e.clientY };
+              // Capture start time and position for tap detection
+              clickStartRef.current = { 
+                x: e.clientX, 
+                y: e.clientY, 
+                time: Date.now() 
+              };
             }}
-            onClick={(e) => {
+            onPointerUp={(e) => {
+              // We use onPointerUp instead of onClick to be more resilient to touch events
+              // that might be partially consumed by the physics engine.
               if (!clickStartRef.current) return;
-              const dist = Math.hypot(
-                e.clientX - clickStartRef.current.x,
-                e.clientY - clickStartRef.current.y
-              );
-              if (dist < 10) {
+
+              const deltaX = Math.abs(e.clientX - clickStartRef.current.x);
+              const deltaY = Math.abs(e.clientY - clickStartRef.current.y);
+              const dist = Math.hypot(deltaX, deltaY);
+              const timeDiff = Date.now() - clickStartRef.current.time;
+              
+              // Mobile friendly Logic:
+              // 1. Threshold increased to 30px (allows for clumsy thumb taps)
+              // 2. Time check < 600ms (ensures it's a tap, not a long press/drag)
+              if (dist < 30 && timeDiff < 600) {
                 onPostClick(post);
               }
               clickStartRef.current = null;
