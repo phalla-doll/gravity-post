@@ -301,7 +301,19 @@ const STATIC_POSTS = [
   { text: "ខ្ញុំមិនឯកាទេ ខ្ញុំមានទូរស័ព្ទ", sentiment: SentimentType.NEUTRAL },
   { text: "ស្រលាញ់ការងារ តែស្រលាញ់ថ្ងៃឈប់សម្រាកជាង", sentiment: SentimentType.HAPPY },
   { text: "ពេលណាបានក្លាយជាសេដ្ឋី?", sentiment: SentimentType.EXCITING },
-  { text: "ជីវិតគឺការរៀនសូត្រ", sentiment: SentimentType.NEUTRAL }
+  { text: "ជីវិតគឺការរៀនសូត្រ", sentiment: SentimentType.NEUTRAL },
+
+  // --- New Khmer Additions (Batch 4 - 10 Posts) ---
+  { text: "សម្រស់មិនសំខាន់ សំខាន់មានលុយ", sentiment: SentimentType.EXCITING },
+  { text: "អ្នកជិតខាងគឺជាកាមេរ៉ាសុវត្ថិភាពល្អបំផុត", sentiment: SentimentType.NEUTRAL },
+  { text: "ចង់ទៅវត្ត... ទៅស្បថឈប់ស្រលាញ់គេ", sentiment: SentimentType.SAD },
+  { text: "ញញឹមដាក់កាមេរ៉ា សង្ឃឹមថារូបស្អាត", sentiment: SentimentType.HAPPY },
+  { text: "គេថាខ្ញុំឆ្កួត តាមពិតខ្ញុំឆ្កួតមែន", sentiment: SentimentType.EXCITING },
+  { text: "ដេកមិនលក់ ព្រោះនឹក... លុយ", sentiment: SentimentType.SAD },
+  { text: "ស្អប់ណាស់ពួកអ្នកដើរលេងចោលផ្ទះ", sentiment: SentimentType.ANGRY },
+  { text: "កុំសួររឿងប្រាក់ខែ សួររឿងប្រាក់ចាយវិញ", sentiment: SentimentType.NEUTRAL },
+  { text: "ខ្ញុំមិនទាបទេ គ្រាន់តែផែនដីខ្ពស់ពេក", sentiment: SentimentType.HAPPY },
+  { text: "ចេះមកពីរៀន មានមកពី... ម៉ែឪ", sentiment: SentimentType.HAPPY }
 ];
 
 export const generateInitialPosts = async (count: number = 20): Promise<Array<{ text: string; sentiment: SentimentType; color: string }>> => {
