@@ -37,13 +37,6 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   
   // Track mobile state for sizing
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 640 : false);
-
-  // Refs to hold latest props for use inside Matter.js events (which form closures)
-  const postsRef = useRef<Post[]>(posts);
-  const onPostClickRef = useRef(onPostClick);
-  
-  // We keep track of bodies to sync with DOM
-  const bodiesMapRef = useRef<Map<string, Matter.Body>>(new Map());
   
   // State to force re-render of DOM elements when physics updates
   const [renderedPosts, setRenderedPosts] = useState<Post[]>([]);
@@ -51,14 +44,15 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   // Track which post is being dragged
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
+  // Interaction tracking for reliable Click vs Drag detection
+  // We store this in a ref to persist across re-renders without causing them
+  const interactionRef = useRef<{ id: string; startX: number; startY: number; startTime: number } | null>(null);
+
   // State to trigger re-initialization on resize
   const [sceneKey, setSceneKey] = useState(0);
 
-  // Keep refs synced
-  useEffect(() => {
-    postsRef.current = posts;
-    onPostClickRef.current = onPostClick;
-  }, [posts, onPostClick]);
+  // We keep track of bodies to sync with DOM
+  const bodiesMapRef = useRef<Map<string, Matter.Body>>(new Map());
 
   // Handle Resize with Debounce
   useEffect(() => {
@@ -165,38 +159,15 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
     Matter.World.add(engine.world, mouseConstraint);
     
-    // --- Tap vs Drag Logic ---
-    let dragStartTime = 0;
-    let dragStartPosition = { x: 0, y: 0 };
-
+    // Track dragging state purely for visual feedback (cursor style)
     Matter.Events.on(mouseConstraint, 'startdrag', (event: any) => {
       setDraggedId(event.body.label);
       if (containerRef.current) containerRef.current.style.cursor = 'grabbing';
-      
-      // Record start conditions
-      dragStartTime = Date.now();
-      dragStartPosition = { ...event.mouse.position };
     });
 
-    Matter.Events.on(mouseConstraint, 'enddrag', (event: any) => {
+    Matter.Events.on(mouseConstraint, 'enddrag', () => {
       setDraggedId(null);
       if (containerRef.current) containerRef.current.style.cursor = 'default';
-
-      // Calculate Move Distance & Time
-      const dragEndTime = Date.now();
-      const currentPos = event.mouse.position;
-      
-      const dist = Math.hypot(currentPos.x - dragStartPosition.x, currentPos.y - dragStartPosition.y);
-      const timeDiff = dragEndTime - dragStartTime;
-
-      // Thresholds: Movement < 30px AND Duration < 500ms -> It's a Click
-      if (dist < 30 && timeDiff < 500) {
-        const postId = event.body.label;
-        const post = postsRef.current.find(p => p.id === postId);
-        if (post) {
-           onPostClickRef.current(post);
-        }
-      }
     });
     // -------------------------------
 
@@ -297,9 +268,37 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
           <div
             key={post.id}
             id={`post-${post.id}`}
-            // NOTE: We removed onClick, onPointerDown, and onPointerUp from here.
-            // Interaction is now handled entirely by the Matter.js engine events in the useEffect above.
-            className={`absolute top-0 left-0 opacity-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
+            // React Events for reliable Click vs Drag Detection
+            onPointerDown={(e) => {
+               // Record start of interaction
+               interactionRef.current = {
+                   id: post.id,
+                   startX: e.clientX,
+                   startY: e.clientY,
+                   startTime: Date.now()
+               };
+            }}
+            onPointerUp={(e) => {
+               const start = interactionRef.current;
+               if (!start || start.id !== post.id) return;
+
+               const deltaX = Math.abs(e.clientX - start.startX);
+               const deltaY = Math.abs(e.clientY - start.startY);
+               const dist = Math.hypot(deltaX, deltaY);
+               const timeDiff = Date.now() - start.startTime;
+
+               // Mobile Click Logic:
+               // If moved less than 15px and released within 600ms, treat as click.
+               // We ignore the Matter.js 'isDragging' state here because sometimes Matter
+               // thinks it's dragging even for micro-movements, but UI-wise it's a click.
+               if (dist < 15 && timeDiff < 600) {
+                   onPostClick(post);
+               }
+               
+               // Reset
+               interactionRef.current = null;
+            }}
+            className={`absolute top-0 left-0 opacity-0 cursor-grab active:cursor-grabbing select-none will-change-transform pointer-events-auto ${isDragged ? 'z-50' : 'z-10'}`}
             style={{ width, height }}
           >
             {/* Inner Visual Container - Glassmorphism & Gradient Effects */}
