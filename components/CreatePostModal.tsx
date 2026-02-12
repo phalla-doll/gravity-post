@@ -10,13 +10,181 @@ interface CreatePostModalProps {
 }
 
 const MOOD_OPTIONS = [
-  { type: SentimentType.HAPPY, label: 'Happy', emoji: '😄' },
-  { type: SentimentType.EXCITING, label: 'Excited', emoji: '🤩' },
-  { type: SentimentType.LOVING, label: 'Loving', emoji: '😍' },
-  { type: SentimentType.NEUTRAL, label: 'Chill', emoji: '☺️' },
-  { type: SentimentType.SAD, label: 'Sad', emoji: '😢' },
-  { type: SentimentType.ANGRY, label: 'Angry', emoji: '😡' },
+  { type: SentimentType.HAPPY, label: 'Happy' },
+  { type: SentimentType.EXCITING, label: 'Excited' },
+  { type: SentimentType.LOVING, label: 'Loving' },
+  { type: SentimentType.NEUTRAL, label: 'Chill' },
+  { type: SentimentType.SAD, label: 'Sad' },
+  { type: SentimentType.ANGRY, label: 'Angry' },
 ];
+
+const renderMoodIcon = (type: SentimentType, color: string) => {
+    switch (type) {
+        case SentimentType.HAPPY:
+            // Detailed Sun with Smile
+            return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:rotate-12">
+                    <defs>
+                        <radialGradient id={`grad-${type}`} cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+                            <stop offset="100%" stopColor={color} stopOpacity="0" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="45" fill={`url(#grad-${type})`} />
+                    {/* Sun Rays */}
+                    <g stroke={color} strokeWidth="2.5" strokeLinecap="round">
+                         {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+                             <line 
+                                key={angle}
+                                x1="50" y1="50" x2="50" y2="15" 
+                                transform={`rotate(${angle} 50 50) translate(0 -28)`} 
+                             />
+                         ))}
+                    </g>
+                    {/* Face Body */}
+                    <circle cx="50" cy="50" r="25" fill="white" stroke={color} strokeWidth="2.5" />
+                    {/* Eyes */}
+                    <path d="M 40 45 Q 43 42 46 45" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    <path d="M 54 45 Q 57 42 60 45" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    {/* Mouth */}
+                    <path d="M 40 58 Q 50 68 60 58" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    {/* Cheeks */}
+                    <circle cx="38" cy="53" r="2" fill={color} opacity="0.5" />
+                    <circle cx="62" cy="53" r="2" fill={color} opacity="0.5" />
+                </svg>
+            );
+
+        case SentimentType.EXCITING:
+            // Lightning Bolt & Stars
+            return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:scale-110">
+                     {/* Dynamic Background */}
+                     <path d="M50 10 L60 35 L85 35 L65 55 L75 80 L50 65 L25 80 L35 55 L15 35 L40 35 Z" fill={color} fillOpacity="0.1" />
+                     
+                     {/* Main Bolt */}
+                     <path 
+                        d="M 55 15 L 35 50 L 55 50 L 45 85 L 75 40 L 55 40 L 65 15 Z" 
+                        fill="white" 
+                        stroke={color} 
+                        strokeWidth="2.5" 
+                        strokeLinejoin="round" 
+                     />
+                     
+                     {/* Electricity sparks */}
+                     <path d="M 25 30 L 15 40" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                     <path d="M 80 70 L 90 60" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                     <circle cx="80" cy="25" r="3" fill={color} />
+                     <circle cx="20" cy="75" r="2" fill={color} />
+                </svg>
+            );
+
+        case SentimentType.LOVING:
+             // Floating Hearts
+             return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:scale-110">
+                    {/* Main Heart */}
+                    <path 
+                        d="M 50 85 C 20 65 10 50 10 35 C 10 20 25 15 40 25 C 45 28 50 35 50 35 C 50 35 55 28 60 25 C 75 15 90 20 90 35 C 90 50 80 65 50 85 Z" 
+                        fill="white" 
+                        stroke={color} 
+                        strokeWidth="2.5" 
+                        strokeLinejoin="round" 
+                    />
+                    {/* Inner Details */}
+                    <path d="M 75 30 Q 80 25 85 30" fill="none" stroke={color} strokeWidth="1.5" opacity="0.6" />
+                    
+                    {/* Small floating hearts */}
+                    <path 
+                        d="M 80 65 C 75 60 72 55 72 50 C 72 45 76 43 79 45 C 80 46 81 47 81 47 C 81 47 82 46 83 45 C 86 43 90 45 90 50 C 90 55 87 60 80 65 Z" 
+                        fill={color} 
+                    />
+                    <path 
+                        d="M 20 65 C 25 60 28 55 28 50 C 28 45 24 43 21 45 C 20 46 19 47 19 47 C 19 47 18 46 17 45 C 14 43 10 45 10 50 C 10 55 13 60 20 65 Z" 
+                        fill={color} 
+                        opacity="0.6"
+                    />
+                </svg>
+             );
+
+        case SentimentType.NEUTRAL:
+             // Coffee Cup
+             return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:rotate-3">
+                    {/* Plate */}
+                    <ellipse cx="50" cy="85" rx="30" ry="8" fill={color} fillOpacity="0.2" />
+                    
+                    {/* Cup Handle */}
+                    <path d="M 70 45 C 85 45 85 65 70 65" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" />
+                    
+                    {/* Cup Body */}
+                    <path 
+                        d="M 25 40 L 25 70 C 25 80 35 85 50 85 C 65 85 75 80 75 70 L 75 40" 
+                        fill="white" 
+                        stroke={color} 
+                        strokeWidth="2.5" 
+                        strokeLinejoin="round" 
+                    />
+                    <line x1="25" y1="40" x2="75" y2="40" stroke={color} strokeWidth="2.5" />
+                    
+                    {/* Steam */}
+                    <path d="M 35 30 Q 40 20 35 15" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+                    <path d="M 50 30 Q 55 20 50 10" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                    <path d="M 65 30 Q 70 20 65 15" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+                </svg>
+             );
+
+        case SentimentType.SAD:
+             // Rain Cloud
+             return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:translate-y-1">
+                    {/* Cloud Body */}
+                    <path 
+                        d="M 25 60 C 15 60 10 50 15 40 C 15 25 30 20 40 25 C 45 15 65 15 70 25 C 85 25 90 40 85 50 C 90 60 80 65 70 60 L 25 60 Z" 
+                        fill="white" 
+                        stroke={color} 
+                        strokeWidth="2.5" 
+                        strokeLinejoin="round" 
+                    />
+                    
+                    {/* Raindrops */}
+                    <path d="M 35 70 L 35 80" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    <path d="M 50 75 L 50 85" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    <path d="M 65 70 L 65 80" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                    
+                    {/* Sad Face on Cloud */}
+                    <path d="M 38 40 L 42 42" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                    <path d="M 62 42 L 66 40" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                    <path d="M 45 52 Q 52 48 59 52" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" />
+                </svg>
+             );
+
+        case SentimentType.ANGRY:
+             // Fire / Bomb
+             return (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm transition-transform duration-500 hover:scale-105">
+                     {/* Flame */}
+                     <path 
+                        d="M 50 15 Q 65 40 80 55 C 90 70 80 90 50 90 C 20 90 10 70 20 55 Q 35 40 50 15 Z" 
+                        fill="white" 
+                        stroke={color} 
+                        strokeWidth="2.5" 
+                        strokeLinejoin="round" 
+                     />
+                     {/* Inner Flame */}
+                     <path 
+                        d="M 50 35 Q 60 55 70 65 C 75 75 65 82 50 82 C 35 82 25 75 30 65 Q 40 55 50 35 Z" 
+                        fill={color} 
+                        opacity="0.2"
+                     />
+                     {/* Angry Eyes */}
+                     <path d="M 35 60 L 45 65" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                     <path d="M 65 60 L 55 65" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+             );
+        default:
+            return null;
+    }
+}
 
 const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearchOpen = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -202,8 +370,10 @@ const DynamicPostCreator: React.FC<CreatePostModalProps> = ({ onSubmit, isSearch
                                 >
                                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundColor: SENTIMENT_COLORS[option.type] }} />
                                     
-                                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
-                                        <span className="text-3xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">{option.emoji}</span>
+                                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-2 py-2">
+                                        <div className="w-14 h-14 transition-transform duration-300 group-hover:scale-110">
+                                            {renderMoodIcon(option.type, SENTIMENT_COLORS[option.type])}
+                                        </div>
                                         <span className="text-xs font-bold text-slate-700 group-hover:text-white transition-colors uppercase tracking-wider">{option.label}</span>
                                     </div>
                                 </button>
