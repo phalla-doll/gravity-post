@@ -4,103 +4,83 @@ const CookingPotLoader: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <style>{`
-        @keyframes smoke-flow-1 {
-          0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
-          20% { opacity: 0.5; }
-          50% { transform: translate(-10px, -40px) scale(1.5); opacity: 0.3; }
-          100% { transform: translate(5px, -90px) scale(2.5); opacity: 0; }
+        @keyframes bubble-rise {
+          0% { transform: translateY(0) scale(0.5); opacity: 0; }
+          20% { opacity: 1; }
+          100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
         }
-        @keyframes smoke-flow-2 {
-          0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
-          25% { opacity: 0.5; }
-          60% { transform: translate(15px, -50px) scale(1.8); opacity: 0.2; }
-          100% { transform: translate(-5px, -100px) scale(3); opacity: 0; }
+        @keyframes pot-wobble {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-1deg); }
+          75% { transform: rotate(1deg); }
         }
-        @keyframes smoke-flow-3 {
-          0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
-          30% { opacity: 0.4; }
-          70% { transform: translate(-8px, -60px) scale(2); opacity: 0.2; }
-          100% { transform: translate(10px, -110px) scale(3); opacity: 0; }
+        @keyframes lid-rattle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-2px); }
         }
-        @keyframes ember-pulse {
-          0%, 100% { fill: #ef4444; filter: drop-shadow(0 0 1px #ef4444); r: 1.5px; }
-          50% { fill: #fca5a5; filter: drop-shadow(0 0 4px #f87171); r: 1.8px; }
+        @keyframes liquid-pulse {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(1.05); }
         }
       `}</style>
 
-      <div className="relative w-48 h-48 flex items-center justify-center">
+      <div className="relative w-32 h-32 flex items-center justify-center">
         
-        {/* Smoke Particles - Added more for density */}
-        {/* Center */}
-        <div className="absolute top-16 left-[50%] w-2 h-2 bg-gray-400/40 rounded-full blur-sm" 
-             style={{ animation: 'smoke-flow-2 3.5s infinite ease-out' }} />
-        <div className="absolute top-14 left-[48%] w-3 h-3 bg-gray-300/30 rounded-full blur-md" 
-             style={{ animation: 'smoke-flow-1 4s infinite ease-out 1s' }} />
-        
-        {/* Left Side */}
-        <div className="absolute top-16 left-[40%] w-2 h-2 bg-gray-400/30 rounded-full blur-sm" 
-             style={{ animation: 'smoke-flow-3 3.8s infinite ease-out 0.5s' }} />
-        <div className="absolute top-18 left-[35%] w-3 h-3 bg-gray-300/20 rounded-full blur-md" 
-             style={{ animation: 'smoke-flow-1 4.2s infinite ease-out 2s' }} />
+        {/* Bubbles */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+             <div className="absolute top-0 left-[40%] w-3 h-3 bg-purple-400 rounded-full blur-[1px]" 
+                  style={{ animation: 'bubble-rise 2s infinite ease-in' }} />
+             <div className="absolute top-4 left-[60%] w-2 h-2 bg-pink-400 rounded-full blur-[1px]" 
+                  style={{ animation: 'bubble-rise 2.5s infinite ease-in 0.5s' }} />
+             <div className="absolute top-2 left-[50%] w-4 h-4 bg-purple-300 rounded-full blur-[1px]" 
+                  style={{ animation: 'bubble-rise 3s infinite ease-in 1.2s' }} />
+        </div>
 
-        {/* Right Side */}
-        <div className="absolute top-16 left-[60%] w-2 h-2 bg-gray-400/30 rounded-full blur-sm" 
-             style={{ animation: 'smoke-flow-3 3.2s infinite ease-out 1.2s' }} />
-        <div className="absolute top-18 left-[65%] w-3 h-3 bg-gray-300/20 rounded-full blur-md" 
-             style={{ animation: 'smoke-flow-2 4.5s infinite ease-out 2.5s' }} />
-
-        {/* Incense Burner SVG */}
-        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-xl z-10">
+        {/* The Pot SVG */}
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-xl z-10 filter drop-shadow-lg" style={{ animation: 'pot-wobble 3s infinite ease-in-out' }}>
           <defs>
-             <linearGradient id="stickGradient" x1="0" y1="0" x2="1" y2="1">
-               <stop offset="0%" stopColor="#7c2d12" /> {/* Dark Brown */}
-               <stop offset="100%" stopColor="#b45309" /> {/* Lighter Brown */}
+             <linearGradient id="potBodyGradient" x1="0" y1="0" x2="1" y2="1">
+               <stop offset="0%" stopColor="#1e293b" /> {/* Slate 800 */}
+               <stop offset="100%" stopColor="#0f172a" /> {/* Slate 900 */}
              </linearGradient>
-             <radialGradient id="ashGradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#d1d5db" />
-                <stop offset="100%" stopColor="#9ca3af" />
-             </radialGradient>
-             <linearGradient id="bowlGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#fbbf24" /> {/* Amber */}
-                <stop offset="100%" stopColor="#b45309" /> {/* Bronze */}
+             <linearGradient id="liquidGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#9333EA" /> {/* Purple 600 */}
+                <stop offset="100%" stopColor="#DB2777" /> {/* Pink 600 */}
+             </linearGradient>
+             <linearGradient id="rimGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#334155" /> 
+                <stop offset="100%" stopColor="#1e293b" /> 
              </linearGradient>
           </defs>
 
-          {/* The Bowl */}
-          <path d="M25 75 Q 50 85, 75 75 L 70 90 Q 50 100, 30 90 Z" fill="url(#bowlGradient)" />
-          {/* Bowl Rim area filled with Ash */}
-          <ellipse cx="50" cy="75" rx="25" ry="8" fill="url(#ashGradient)" />
+          {/* Pot Legs */}
+          <path d="M 25 80 L 20 95" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" />
+          <path d="M 75 80 L 80 95" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" />
 
-          {/* Incense Sticks - Fanned out */}
+          {/* Pot Body */}
+          <path d="M 15 40 Q 15 90 50 90 Q 85 90 85 40 Z" fill="url(#potBodyGradient)" />
+
+          {/* Liquid (Animated) */}
+          <path d="M 18 40 Q 50 50 82 40 Z" fill="url(#liquidGradient)" opacity="0.8" style={{ animation: 'liquid-pulse 2s infinite ease-in-out', transformOrigin: 'center' }} />
           
-          {/* Far Left Stick */}
-          <line x1="38" y1="74" x2="20" y2="45" stroke="url(#stickGradient)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="20" cy="45" r="1.5" style={{ animation: 'ember-pulse 2s infinite ease-in-out 0.2s' }} />
-
-          {/* Mid Left Stick */}
-          <line x1="44" y1="76" x2="35" y2="35" stroke="url(#stickGradient)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="35" cy="35" r="1.5" style={{ animation: 'ember-pulse 2.2s infinite ease-in-out 0.8s' }} />
-
-          {/* Center Stick */}
-          <line x1="50" y1="78" x2="50" y2="28" stroke="url(#stickGradient)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="50" cy="28" r="1.5" style={{ animation: 'ember-pulse 1.8s infinite ease-in-out 0s' }} />
-
-          {/* Mid Right Stick */}
-          <line x1="56" y1="76" x2="65" y2="35" stroke="url(#stickGradient)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="65" cy="35" r="1.5" style={{ animation: 'ember-pulse 2.5s infinite ease-in-out 0.5s' }} />
-
-          {/* Far Right Stick */}
-          <line x1="62" y1="74" x2="80" y2="45" stroke="url(#stickGradient)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="80" cy="45" r="1.5" style={{ animation: 'ember-pulse 2.1s infinite ease-in-out 1.2s' }} />
+          {/* Rim */}
+          <ellipse cx="50" cy="40" rx="38" ry="6" fill="none" stroke="url(#rimGradient)" strokeWidth="4" />
           
+          {/* Handles */}
+          <path d="M 15 45 Q 5 45 10 55" fill="none" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+          <path d="M 85 45 Q 95 45 90 55" fill="none" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+          
+          {/* Reflection */}
+          <path d="M 25 50 Q 25 75 40 80" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" strokeLinecap="round" />
+
         </svg>
       </div>
 
-      <div className="mt-2 text-center">
-         <h3 className="text-lg font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-red-600 animate-pulse tracking-wide">
-            Praying...
+      <div className="mt-4 text-center">
+         <h3 className="text-lg font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 animate-pulse tracking-wide">
+            Brewing...
          </h3>
-         <p className="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1">getting posts from God...</p>
+         <p className="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1">Cooking up fresh drops</p>
       </div>
     </div>
   );
