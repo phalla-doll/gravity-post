@@ -38,9 +38,9 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
   // Track mobile state for sizing
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 640 : false);
 
-  // Ref to track click start position and time for distinguishing drag vs click
-  // Added time tracking for better mobile 'tap' detection
-  const clickStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // Refs to hold latest props for use inside Matter.js events (which form closures)
+  const postsRef = useRef<Post[]>(posts);
+  const onPostClickRef = useRef(onPostClick);
   
   // We keep track of bodies to sync with DOM
   const bodiesMapRef = useRef<Map<string, Matter.Body>>(new Map());
@@ -53,6 +53,12 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
   // State to trigger re-initialization on resize
   const [sceneKey, setSceneKey] = useState(0);
+
+  // Keep refs synced
+  useEffect(() => {
+    postsRef.current = posts;
+    onPostClickRef.current = onPostClick;
+  }, [posts, onPostClick]);
 
   // Handle Resize with Debounce
   useEffect(() => {
@@ -159,15 +165,38 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
 
     Matter.World.add(engine.world, mouseConstraint);
     
-    // Add drag events for visual feedback
+    // --- Tap vs Drag Logic ---
+    let dragStartTime = 0;
+    let dragStartPosition = { x: 0, y: 0 };
+
     Matter.Events.on(mouseConstraint, 'startdrag', (event: any) => {
       setDraggedId(event.body.label);
       if (containerRef.current) containerRef.current.style.cursor = 'grabbing';
+      
+      // Record start conditions
+      dragStartTime = Date.now();
+      dragStartPosition = { ...event.mouse.position };
     });
 
-    Matter.Events.on(mouseConstraint, 'enddrag', () => {
+    Matter.Events.on(mouseConstraint, 'enddrag', (event: any) => {
       setDraggedId(null);
       if (containerRef.current) containerRef.current.style.cursor = 'default';
+
+      // Calculate Move Distance & Time
+      const dragEndTime = Date.now();
+      const currentPos = event.mouse.position;
+      
+      const dist = Math.hypot(currentPos.x - dragStartPosition.x, currentPos.y - dragStartPosition.y);
+      const timeDiff = dragEndTime - dragStartTime;
+
+      // Thresholds: Movement < 30px AND Duration < 500ms -> It's a Click
+      if (dist < 30 && timeDiff < 500) {
+        const postId = event.body.label;
+        const post = postsRef.current.find(p => p.id === postId);
+        if (post) {
+           onPostClickRef.current(post);
+        }
+      }
     });
     // -------------------------------
 
@@ -203,8 +232,6 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
              el.style.opacity = '1'; 
              
              // Glitch safety: Reset if fallen too far out of bounds
-             // FIX: Use 'height' (container height) instead of 'engine.world.bounds.max.y'
-             // 'engine.world.bounds' is often undefined in Matter.js causing the error
              if (y > height + 200) {
                Matter.Body.setPosition(body, { 
                  x: Math.random() * (bWidth - 100) + 50, 
@@ -224,7 +251,6 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       Matter.Runner.stop(runner);
       Matter.Engine.clear(engine);
       engineRef.current = null;
-      // Important: Clear bodies map so they are re-created in the next sync
       bodiesMapRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -252,7 +278,7 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
       }
     });
 
-  }, [posts, addBodyForPost, sceneKey]); // Depend on sceneKey to re-populate after reset
+  }, [posts, addBodyForPost, sceneKey]); 
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden touch-none">
@@ -271,34 +297,8 @@ const PhysicsWorld: React.FC<PhysicsWorldProps> = ({ posts, onPostClick }) => {
           <div
             key={post.id}
             id={`post-${post.id}`}
-            onPointerDown={(e) => {
-              // Capture start time and position for tap detection
-              clickStartRef.current = { 
-                x: e.clientX, 
-                y: e.clientY, 
-                time: Date.now() 
-              };
-            }}
-            onPointerUp={(e) => {
-              // We use onPointerUp instead of onClick to be more resilient to touch events
-              // that might be partially consumed by the physics engine.
-              if (!clickStartRef.current) return;
-
-              const deltaX = Math.abs(e.clientX - clickStartRef.current.x);
-              const deltaY = Math.abs(e.clientY - clickStartRef.current.y);
-              const dist = Math.hypot(deltaX, deltaY);
-              const timeDiff = Date.now() - clickStartRef.current.time;
-              
-              // Mobile friendly Logic:
-              // 1. Threshold increased to 30px (allows for clumsy thumb taps)
-              // 2. Time check < 600ms (ensures it's a tap, not a long press/drag)
-              if (dist < 30 && timeDiff < 600) {
-                onPostClick(post);
-              }
-              clickStartRef.current = null;
-            }}
-            // Added opacity-0 here. It will be set to opacity-1 by the physics loop once positioned.
-            // This prevents the "stuck at top left" flash before physics kicks in.
+            // NOTE: We removed onClick, onPointerDown, and onPointerUp from here.
+            // Interaction is now handled entirely by the Matter.js engine events in the useEffect above.
             className={`absolute top-0 left-0 opacity-0 cursor-grab active:cursor-grabbing select-none will-change-transform ${isDragged ? 'z-50' : 'z-10'}`}
             style={{ width, height }}
           >
